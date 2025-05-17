@@ -54,6 +54,7 @@ export default function CategoryItem({
   }
 
   return (
+    <>
     <div
       className={`flex items-center ${
         selectedCategory === category._id
@@ -116,8 +117,9 @@ export default function CategoryItem({
         >
           <Trash size={14} />
         </button>
-
-        {showConfirm && (
+      </div>
+    </div>
+    {showConfirm && (
           <ConfirmModal
             message={`Är du säker på att du vill ta bort kategorin "${category.name}"?`}
             onConfirm={() => {
@@ -127,7 +129,6 @@ export default function CategoryItem({
             onCancel={() => setShowConfirm(false)}
           />
         )}
-      </div>
-    </div>
+    </>
   );
 }

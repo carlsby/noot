@@ -1,8 +1,8 @@
 {
-  "name": "todo",
+  "name": "noot",
   "version": "1.0.0",
   "description": "",
-  "main": "main/main.js",
+  "main": "renderer/main.js",
   "type": "commonjs",
   "scripts": {
     "dev": "concurrently \"npm:start-electron\" \"npm:start-react\"",
@@ -15,11 +15,11 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.yourname.todo",
-    "productName": "Todo",
+    "appId": "com.yourname.noot",
+    "productName": "Noot",
     "files": [
-      "main/**/*",
-      "frontend/build/**/*",
+      "renderer/**/*",
+      "frontend/dist/**/*",
       "preload.js",
       "package.json",
       "node_modules/**/*"
@@ -28,16 +28,29 @@
       {
         "from": "data/",
         "to": "data",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "logs/",
         "to": "logs",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "renderer/assets"
+    },
+    "win": {
+      "icon": "noot.ico"
+    },
+    "mac": {
+      "icon": "noot.ico"
+    },
+    "linux": {
+      "icon": "noot.ico"
     }
   },
   "devDependencies": {

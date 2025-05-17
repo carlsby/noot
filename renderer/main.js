@@ -97,7 +97,13 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
-  win.loadURL("http://localhost:5173");
+  if (app.isPackaged) {
+    win.loadFile(
+      path.resolve(__dirname, "..", "frontend", "dist", "index.html")
+    );
+  } else {
+    win.loadURL("http://localhost:5173");
+  }
 }
 
 app.whenReady().then(() => {
