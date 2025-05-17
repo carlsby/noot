@@ -1,0 +1,97 @@
+import { useState } from "react";
+import { Check, Edit, Trash, Save, X } from "lucide-react";
+
+export default function TaskItem({
+  task,
+  updateTask,
+  toggleTaskCompletion,
+  deleteTask,
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(task.text);
+
+  const handleSave = () => {
+    if (editText.trim() === "") return;
+    updateTask(task.id, editText);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditText(task.text);
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div
+        className="flex items-center p-4 rounded-xl border border-blue-500 shadow-sm
+                    dark:bg-gray-800 bg-white"
+      >
+        <input
+          type="text"
+          className="flex-1 px-2 py-1 focus:outline-none
+                    dark:bg-gray-800 dark:text-white bg-white text-gray-900"
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSave()}
+          autoFocus
+        />
+        <button
+          className="ml-2 text-blue-500 hover:text-blue-600"
+          onClick={handleSave}
+        >
+          <Save size={18} />
+        </button>
+        <button
+          className="ml-2 text-gray-500 hover:text-gray-600"
+          onClick={handleCancel}
+        >
+          <X size={18} />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`flex items-center p-4 rounded-xl border transition-all 
+                ${task.completed ? "opacity-60" : ""} 
+                dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
+                bg-white border-gray-200 hover:border-gray-300`}
+    >
+      <button
+        className={`w-5 h-5 mr-4 flex items-center justify-center rounded-full border ${
+          task.completed
+            ? "bg-green-500 border-green-500 text-white"
+            : "border-gray-400 hover:border-green-500"
+        }`}
+        onClick={() => toggleTaskCompletion(task.id)}
+      >
+        {task.completed && <Check size={14} />}
+      </button>
+      <span
+        className={`flex-1 ${
+          task.completed
+            ? "line-through text-gray-500 dark:text-gray-500"
+            : "text-gray-900 dark:text-white"
+        }`}
+      >
+        {task.text}
+      </span>
+      <div className="hidden group-hover:flex">
+        <button
+          className="ml-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 p-1"
+          onClick={() => setIsEditing(true)}
+        >
+          <Edit size={16} />
+        </button>
+        <button
+          className="ml-1 text-gray-500 dark:text-gray-400 hover:text-red-500 p-1"
+          onClick={() => deleteTask(task.id)}
+        >
+          <Trash size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
