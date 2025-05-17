@@ -22,10 +22,10 @@ export default function TaskArea({
         <div className="flex items-center">
           <div
             className="w-4 h-4 rounded-full mr-3"
-            style={{ backgroundColor: currentCategory.color }}
+            style={{ backgroundColor: currentCategory?.color }}
           ></div>
           <h1 className="text-2xl font-medium dark:text-white text-gray-900">
-            {currentCategory.name}
+            {currentCategory?.name}
           </h1>
         </div>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">

@@ -24,7 +24,7 @@ export default function TaskList({
   return (
     <ul className="space-y-3 max-w-3xl mx-auto">
       {tasks.map((task) => (
-        <li key={task.id} className="group">
+        <li key={task._id} className="group">
           <TaskItem
             task={task}
             updateTask={updateTask}

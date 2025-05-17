@@ -20,7 +20,7 @@ export default function Sidebar({
     <div
       className="w-72 p-4 flex flex-col border-r transition-colors duration-300
                   dark:bg-gray-900 dark:border-gray-700 
-                  bg-gray-100 border-gray-200"
+                  bg-gray-100 border-gray-200 overflow-hidden"
     >
       {/* <div className="mb-6 mt-2">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />

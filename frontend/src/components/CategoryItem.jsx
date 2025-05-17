@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Edit, Trash, Save, X } from "lucide-react";
+import { ConfirmModal } from "./ConfirmModal";
 
 export default function CategoryItem({
   category,
@@ -11,8 +12,7 @@ export default function CategoryItem({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(category.name);
-
-  console.log(category)
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSave = () => {
     if (editText.trim() === "") return;
@@ -54,27 +54,39 @@ export default function CategoryItem({
   }
 
   return (
-    <div className="flex items-center">
+    <div
+      className={`flex items-center ${
+        selectedCategory === category._id
+          ? "dark:bg-gray-800 bg-white shadow-sm"
+          : "dark:hover:bg-gray-800/50 hover:bg-white/50 transition-all"
+      }`}
+    >
       <button
-        className={`flex items-center flex-1 px-3 py-2 rounded-lg text-left transition-all
-                  ${
-                    selectedCategory === category._id
-                      ? "dark:bg-gray-800 bg-white shadow-sm"
-                      : "dark:hover:bg-gray-800/50 hover:bg-white/50"
-                  }`}
+        className="flex items-center flex-1 px-3 py-2 rounded-lg text-left"
         onClick={() => setSelectedCategory(category._id)}
       >
         <div
           className="w-3 h-3 rounded-full mr-3"
           style={{ backgroundColor: category.color }}
         ></div>
-        <span
-          className={`${
-            selectedCategory === category._id ? "font-medium" : ""
-          } dark:text-white`}
-        >
-          {category.name}
-        </span>
+        <div className="relative group max-w-[120px] h-[20px]">
+          <span
+            className={`
+      inline-block
+      whitespace-nowrap
+      overflow-visible
+      group-hover:overflow-hidden
+      group-hover:text-ellipsis
+      group-hover:w-full
+      transition-all
+      ${selectedCategory === category._id ? "font-medium" : ""}
+      dark:text-white text-gray-900
+    `}
+          >
+            {category.name}
+          </span>
+        </div>
+
         <span
           className={`ml-auto px-2 py-0.5 rounded-full text-xs ${
             selectedCategory === category._id
@@ -85,7 +97,7 @@ export default function CategoryItem({
           {getTaskCount(category._id)}
         </span>
       </button>
-      <div className="hidden group-hover:flex pr-2">
+      <div className="hidden group-hover:flex pr-2 transition-all">
         <button
           className="ml-1 text-gray-500 hover:text-gray-600 p-1"
           onClick={(e) => {
@@ -99,11 +111,22 @@ export default function CategoryItem({
           className="ml-1 text-gray-500 hover:text-red-500 p-1"
           onClick={(e) => {
             e.stopPropagation();
-            deleteCategory(category._id);
+            setShowConfirm(true);
           }}
         >
           <Trash size={14} />
         </button>
+
+        {showConfirm && (
+          <ConfirmModal
+            message={`Är du säker på att du vill ta bort kategorin "${category.name}"?`}
+            onConfirm={() => {
+              deleteCategory(category._id);
+              setShowConfirm(false);
+            }}
+            onCancel={() => setShowConfirm(false)}
+          />
+        )}
       </div>
     </div>
   );

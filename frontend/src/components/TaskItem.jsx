@@ -12,7 +12,7 @@ export default function TaskItem({
 
   const handleSave = () => {
     if (editText.trim() === "") return;
-    updateTask(task.id, editText);
+    updateTask(task._id, editText);
     setIsEditing(false);
   };
 
@@ -60,21 +60,22 @@ export default function TaskItem({
                 bg-white border-gray-200 hover:border-gray-300`}
     >
       <button
-        className={`w-5 h-5 mr-4 flex items-center justify-center rounded-full border ${
+        className={`w-5 h-5 flex items-center justify-center rounded-full border ${
           task.completed
             ? "bg-green-500 border-green-500 text-white"
             : "border-gray-400 hover:border-green-500"
         }`}
-        onClick={() => toggleTaskCompletion(task.id)}
+        onClick={() => toggleTaskCompletion(task._id)}
       >
         {task.completed && <Check size={14} />}
       </button>
       <span
-        className={`flex-1 ${
+        className={`flex-1 ps-4 cursor-pointer ${
           task.completed
             ? "line-through text-gray-500 dark:text-gray-500"
             : "text-gray-900 dark:text-white"
         }`}
+        onClick={() => toggleTaskCompletion(task._id)}
       >
         {task.text}
       </span>
@@ -87,7 +88,7 @@ export default function TaskItem({
         </button>
         <button
           className="ml-1 text-gray-500 dark:text-gray-400 hover:text-red-500 p-1"
-          onClick={() => deleteTask(task.id)}
+          onClick={() => deleteTask(task._id)}
         >
           <Trash size={16} />
         </button>

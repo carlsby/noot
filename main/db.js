@@ -1,47 +1,65 @@
-const path = require('path')
-const Datastore = require('nedb')
-const logger = require('./logger');
+const path = require("path");
+const Datastore = require("nedb");
+const logger = require("./logger");
 
 // Skapa data-mappen om den inte finns (lägg till fs)
-const fs = require('fs')
-const dataDir = path.join(process.cwd(), 'data')
+const fs = require("fs");
+const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir)
+  fs.mkdirSync(dataDir);
 }
 
-const categoriesDB = new Datastore({ filename: path.join(dataDir, 'categories.db'), autoload: true })
-const tasksDB = new Datastore({ filename: path.join(dataDir, 'tasks.db'), autoload: true })
+const categoriesDB = new Datastore({
+  filename: path.join(dataDir, "categories.db"),
+  autoload: true,
+});
+const tasksDB = new Datastore({
+  filename: path.join(dataDir, "tasks.db"),
+  autoload: true,
+});
+const colorModeDB = new Datastore({
+  filename: path.join(dataDir, "color.db"),
+  autoload: true,
+});
+const selectedCategoryDB = new Datastore({
+  filename: path.join(dataDir, "selectedCategory.db"),
+  autoload: true,
+});
+
 
 // Funktioner för kategorier
 
 function getCategories() {
   return new Promise((resolve, reject) => {
     categoriesDB.find({}, (err, docs) => {
-      if (err) reject(err)
-      else resolve(docs)
-    })
-  })
+      if (err) reject(err);
+      else resolve(docs);
+    });
+  });
 }
 
 function addCategory(cat) {
   return new Promise((resolve, reject) => {
     categoriesDB.insert(cat, (err, newDoc) => {
-      if (err) reject(err)
-      else resolve(newDoc)
-    })
-  })
+      if (err) reject(err);
+      else resolve(newDoc);
+    });
+  });
 }
 
 function updateCategory(id, update) {
   return new Promise((resolve, reject) => {
-    categoriesDB.update({ _id: id }, { $set: update }, {}, (err, numUpdated) => {
-      if (err) reject(err)
-      else resolve(numUpdated)
-    })
-  })
+    categoriesDB.update(
+      { _id: id },
+      { $set: update },
+      {},
+      (err, numUpdated) => {
+        if (err) reject(err);
+        else resolve(numUpdated);
+      }
+    );
+  });
 }
-
-
 
 function deleteCategory(id) {
   logger.info(`Deleting category with id: ${id}`);
@@ -66,43 +84,101 @@ function deleteCategory(id) {
   });
 }
 
+function setSelectedCategory(categoryId) {
+  return new Promise((resolve, reject) => {
+    selectedCategoryDB.update(
+      { _id: "selectedCategory" },
+      { _id: "selectedCategory", categoryId },
+      { upsert: true },
+      (err, numUpdated) => {
+        if (err) reject(err);
+        else resolve(numUpdated);
+      }
+    );
+  });
+}
+
+function getSelectedCategory() {
+  return new Promise((resolve, reject) => {
+    selectedCategoryDB.findOne({ _id: "selectedCategory" }, (err, doc) => {
+      if (err) reject(err);
+      else resolve(doc?.categoryId || null);
+    });
+  });
+}
+
+function clearSelectedCategory() {
+  return new Promise((resolve, reject) => {
+    selectedCategoryDB.remove({ _id: "selectedCategory" }, {}, (err, numRemoved) => {
+      if (err) reject(err);
+      else resolve(numRemoved);
+    });
+  });
+}
+
+
 
 // Funktioner för tasks
 
 function getTasks() {
   return new Promise((resolve, reject) => {
     tasksDB.find({}, (err, docs) => {
-      if (err) reject(err)
-      else resolve(docs)
-    })
-  })
+      if (err) reject(err);
+      else resolve(docs);
+    });
+  });
 }
 
 function addTask(task) {
   return new Promise((resolve, reject) => {
     tasksDB.insert(task, (err, newDoc) => {
-      if (err) reject(err)
-      else resolve(newDoc)
-    })
-  })
+      if (err) reject(err);
+      else resolve(newDoc);
+    });
+  });
 }
 
 function updateTask(id, update) {
   return new Promise((resolve, reject) => {
     tasksDB.update({ _id: id }, { $set: update }, {}, (err, numUpdated) => {
-      if (err) reject(err)
-      else resolve(numUpdated)
-    })
-  })
+      if (err) reject(err);
+      else resolve(numUpdated);
+    });
+  });
 }
 
 function deleteTask(id) {
   return new Promise((resolve, reject) => {
     tasksDB.remove({ _id: id }, {}, (err, numRemoved) => {
-      if (err) reject(err)
-      else resolve(numRemoved)
-    })
-  })
+      if (err) reject(err);
+      else resolve(numRemoved);
+    });
+  });
+}
+
+// Darkmode toggle
+
+function setColorMode(mode) {
+  return new Promise((resolve, reject) => {
+    colorModeDB.update(
+      { _id: "colorMode" },
+      { _id: "colorMode", mode },
+      { upsert: true },
+      (err, numUpdated) => {
+        if (err) reject(err);
+        else resolve(numUpdated);
+      }
+    );
+  });
+}
+
+function getColorMode() {
+  return new Promise((resolve, reject) => {
+    colorModeDB.findOne({ _id: "colorMode" }, (err, doc) => {
+      if (err) reject(err);
+      else resolve(doc?.mode || "light");
+    });
+  });
 }
 
 module.exports = {
@@ -114,4 +190,9 @@ module.exports = {
   addTask,
   updateTask,
   deleteTask,
-}
+  getColorMode,
+  setColorMode,
+  getSelectedCategory,
+  setSelectedCategory,
+  clearSelectedCategory
+};

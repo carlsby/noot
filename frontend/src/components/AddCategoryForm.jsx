@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useState } from "react"
+import { Plus } from "lucide-react"
 
 export default function AddCategoryForm({ addCategory }) {
-  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState("")
 
   const handleAddCategory = () => {
-    if (newCategoryName.trim() === "") return;
-    addCategory(newCategoryName);
-    setNewCategoryName("");
-  };
+    if (newCategoryName.trim() === "") return
+    addCategory(newCategoryName)
+    setNewCategoryName("")
+  }
 
   return (
     <div className="flex items-center">
@@ -30,5 +30,5 @@ export default function AddCategoryForm({ addCategory }) {
         <Plus size={18} />
       </button>
     </div>
-  );
+  )
 }
