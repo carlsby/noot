@@ -8,4 +8,4 @@ cd frontend -> npm i
 Stå i root <br />
 npm react-build <br />
 Öppna windows terminal som administratör -> npm run dist <br />
-Öppna upp dist filen som skapades och installera
+Öppna upp dist mappen som skapades och installera
