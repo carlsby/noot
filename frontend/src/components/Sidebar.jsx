@@ -2,6 +2,7 @@
 import CategoryList from "./CategoryList";
 import AddCategoryForm from "./AddCategoryForm";
 import DarkModeToggle from "./DarkModeToggle";
+import CodeAreaButton from "./CodeAreaButton";
 
 export default function Sidebar({
   darkMode,
@@ -15,6 +16,7 @@ export default function Sidebar({
   updateCategory,
   deleteCategory,
   getTaskCount,
+  setCodeMode
 }) {
   return (
     <div
@@ -40,10 +42,12 @@ export default function Sidebar({
         updateCategory={updateCategory}
         deleteCategory={deleteCategory}
         getTaskCount={getTaskCount}
+        setCodeMode={setCodeMode}
       />
 
       <div className="mt-auto">
         <AddCategoryForm addCategory={addCategory} />
+        <CodeAreaButton setCodeMode={setCodeMode}  setSelectedCategory={setSelectedCategory} />
       </div>
     </div>
   );

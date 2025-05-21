@@ -7,6 +7,7 @@ export default function CategoryList({
   updateCategory,
   deleteCategory,
   getTaskCount,
+  setCodeMode
 }) {
   return (
     <div className="flex-1 overflow-y-auto mb-4">
@@ -20,6 +21,7 @@ export default function CategoryList({
               updateCategory={updateCategory}
               deleteCategory={deleteCategory}
               getTaskCount={getTaskCount}
+              setCodeMode={setCodeMode}
             />
           </li>
         ))}

@@ -9,6 +9,7 @@ export default function CategoryItem({
   updateCategory,
   deleteCategory,
   getTaskCount,
+  setCodeMode,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(category.name);
@@ -30,7 +31,7 @@ export default function CategoryItem({
       <div className="flex items-center p-1">
         <input
           type="text"
-          className="flex-1 px-3 py-2 rounded-lg border border-blue-500 focus:outline-none
+          className="flex-1 px-3 py-2 rounded-lg border border-purple-500 focus:outline-none
                     dark:bg-gray-800 dark:text-white bg-white text-gray-900"
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
@@ -38,7 +39,7 @@ export default function CategoryItem({
           autoFocus
         />
         <button
-          className="ml-2 text-blue-500 hover:text-blue-600"
+          className="ml-2 text-purple-500 hover:text-purple-600"
           onClick={handleSave}
         >
           <Save size={16} />
@@ -55,24 +56,27 @@ export default function CategoryItem({
 
   return (
     <>
-    <div
-      className={`flex items-center ${
-        selectedCategory === category._id
-          ? "dark:bg-gray-800 bg-white shadow-sm"
-          : "dark:hover:bg-gray-800/50 hover:bg-white/50 transition-all"
-      }`}
-    >
-      <button
-        className="flex items-center flex-1 px-3 py-2 rounded-lg text-left"
-        onClick={() => setSelectedCategory(category._id)}
+      <div
+        className={`flex items-center ${
+          selectedCategory === category._id
+            ? "dark:bg-gray-800 bg-white shadow-sm"
+            : "dark:hover:bg-gray-800/50 hover:bg-white/50 transition-all"
+        }`}
       >
-        <div
-          className="w-3 h-3 rounded-full mr-3"
-          style={{ backgroundColor: category.color }}
-        ></div>
-        <div className="relative group max-w-[120px] h-[20px]">
-          <span
-            className={`
+        <button
+          className="flex items-center flex-1 px-3 py-2 rounded-lg text-left"
+          onClick={() => {
+            setSelectedCategory(category._id);
+            setCodeMode(false);
+          }}
+        >
+          <div
+            className="w-3 h-3 rounded-full mr-3"
+            style={{ backgroundColor: category.color }}
+          ></div>
+          <div className="relative group max-w-[120px] h-[20px]">
+            <span
+              className={`
       inline-block
       whitespace-nowrap
       overflow-visible
@@ -83,52 +87,52 @@ export default function CategoryItem({
       ${selectedCategory === category._id ? "font-medium" : ""}
       dark:text-white text-gray-900
     `}
-          >
-            {category.name}
-          </span>
-        </div>
+            >
+              {category.name}
+            </span>
+          </div>
 
-        <span
-          className={`ml-auto px-2 py-0.5 rounded-full text-xs ${
-            selectedCategory === category._id
-              ? "bg-blue-500 text-white"
-              : "dark:bg-gray-700 dark:text-gray-300 bg-gray-200 text-gray-600"
-          }`}
-        >
-          {getTaskCount(category._id)}
-        </span>
-      </button>
-      <div className="hidden group-hover:flex pr-2 transition-all">
-        <button
-          className="ml-1 text-gray-500 hover:text-gray-600 p-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsEditing(true);
-          }}
-        >
-          <Edit size={14} />
+          <span
+            className={`ml-auto px-2 py-0.5 rounded-full text-xs ${
+              selectedCategory === category._id
+                ? "bg-purple-500 text-white"
+                : "dark:bg-gray-700 dark:text-gray-300 bg-gray-200 text-gray-600"
+            }`}
+          >
+            {getTaskCount(category._id)}
+          </span>
         </button>
-        <button
-          className="ml-1 text-gray-500 hover:text-red-500 p-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowConfirm(true);
-          }}
-        >
-          <Trash size={14} />
-        </button>
-      </div>
-    </div>
-    {showConfirm && (
-          <ConfirmModal
-            message={`Är du säker på att du vill ta bort kategorin "${category.name}"?`}
-            onConfirm={() => {
-              deleteCategory(category._id);
-              setShowConfirm(false);
+        <div className="hidden group-hover:flex pr-2 transition-all">
+          <button
+            className="ml-1 text-gray-500 hover:text-gray-600 p-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
             }}
-            onCancel={() => setShowConfirm(false)}
-          />
-        )}
+          >
+            <Edit size={14} />
+          </button>
+          <button
+            className="ml-1 text-gray-500 hover:text-red-500 p-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowConfirm(true);
+            }}
+          >
+            <Trash size={14} />
+          </button>
+        </div>
+      </div>
+      {showConfirm && (
+        <ConfirmModal
+          message={`Är du säker på att du vill ta bort kategorin "${category.name}"?`}
+          onConfirm={() => {
+            deleteCategory(category._id);
+            setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </>
   );
 }

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import TaskArea from "./components/TaskArea";
+import CodeArea from "./components/CodeArea";
 
 export default function App() {
   const [categories, setCategories] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [codeMode, setCodeMode] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -180,16 +182,21 @@ export default function App() {
         updateCategory={updateCategory}
         deleteCategory={deleteCategory}
         getTaskCount={getTaskCount}
+        setCodeMode={setCodeMode}
       />
-      <TaskArea
-        currentCategory={getCurrentCategory()}
-        filteredTasks={getFilteredTasks()}
-        addTask={addTask}
-        updateTask={updateTask}
-        toggleTaskCompletion={toggleTaskCompletion}
-        deleteTask={deleteTask}
-        categories={categories}
-      />
+      {codeMode ? (
+        <CodeArea />
+      ) : (
+        <TaskArea
+          currentCategory={getCurrentCategory()}
+          filteredTasks={getFilteredTasks()}
+          addTask={addTask}
+          updateTask={updateTask}
+          toggleTaskCompletion={toggleTaskCompletion}
+          deleteTask={deleteTask}
+          categories={categories}
+        />
+      )}
     </div>
   );
 }

@@ -24,7 +24,7 @@ export default function TaskItem({
   if (isEditing) {
     return (
       <div
-        className="flex items-center p-4 rounded-xl border border-blue-500 shadow-sm
+        className="flex items-center p-4 rounded-xl border border-purple-500 shadow-sm
                     dark:bg-gray-800 bg-white"
       >
         <input
@@ -37,7 +37,7 @@ export default function TaskItem({
           autoFocus
         />
         <button
-          className="ml-2 text-blue-500 hover:text-blue-600"
+          className="ml-2 text-purple-500 hover:text-purple-600"
           onClick={handleSave}
         >
           <Save size={18} />
@@ -81,7 +81,7 @@ export default function TaskItem({
       </span>
       <div className="hidden group-hover:flex">
         <button
-          className="ml-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 p-1"
+          className="ml-1 text-gray-500 dark:text-gray-400 hover:text-purple-500 p-1"
           onClick={() => setIsEditing(true)}
         >
           <Edit size={16} />
