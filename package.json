@@ -26,13 +26,6 @@
     ],
     "extraFiles": [
       {
-        "from": "data/",
-        "to": "data",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
         "from": "logs/",
         "to": "logs",
         "filter": [

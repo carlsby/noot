@@ -8,13 +8,13 @@ export default function TaskArea({
   updateTask,
   toggleTaskCompletion,
   deleteTask,
+  updateTaskOrder,
 }) {
   return (
     <div
       className="flex-1 flex flex-col transition-colors duration-300 
                   dark:bg-gray-900 bg-white"
     >
-      {/* Header */}
       <div
         className="px-8 py-6 border-b transition-colors duration-300
                     dark:border-gray-700 border-gray-200"
@@ -34,17 +34,16 @@ export default function TaskArea({
         </p>
       </div>
 
-      {/* Tasks list */}
       <div className="flex-1 overflow-y-auto p-6">
         <TaskList
           tasks={filteredTasks}
           updateTask={updateTask}
           toggleTaskCompletion={toggleTaskCompletion}
           deleteTask={deleteTask}
+          updateTaskOrder={updateTaskOrder}
         />
       </div>
 
-      {/* Add new task */}
       <div
         className="p-6 border-t transition-colors duration-300
                     dark:border-gray-700 border-gray-200"

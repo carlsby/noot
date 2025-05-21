@@ -83,6 +83,11 @@ function setupIpcHandlers() {
   ipcMain.handle("clear-selected-category", async () => {
     return await db.clearSelectedCategory();
   });
+
+  ipcMain.handle("update-tasks-order", async (_, tasks) => {
+  return await db.updateMultipleTasksOrder(tasks);
+});
+
 }
 
 function createWindow() {

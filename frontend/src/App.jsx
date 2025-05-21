@@ -151,6 +151,10 @@ export default function App() {
     }
   };
 
+  const updateTaskOrder = async (_id, order) => {
+    await window.electronAPI.invoke("update-tasks-order", _id, order);
+  };
+
   const getTaskCount = (categoryId) => {
     return tasks.filter(
       (task) => task.categoryId === categoryId && !task.completed
@@ -195,6 +199,7 @@ export default function App() {
           toggleTaskCompletion={toggleTaskCompletion}
           deleteTask={deleteTask}
           categories={categories}
+          updateTaskOrder={updateTaskOrder}
         />
       )}
     </div>

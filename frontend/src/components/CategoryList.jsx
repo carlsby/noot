@@ -9,6 +9,9 @@ export default function CategoryList({
   getTaskCount,
   setCodeMode
 }) {
+
+  categories.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
   return (
     <div className="flex-1 overflow-y-auto mb-4">
       <ul className="space-y-1">

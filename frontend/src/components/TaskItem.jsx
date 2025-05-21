@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Check, Edit, Trash, Save, X } from "lucide-react";
+import { Check, Edit, Trash, Save, X, List, Menu } from "lucide-react";
 
 export default function TaskItem({
   task,
   updateTask,
   toggleTaskCompletion,
   deleteTask,
+  dragHandleProps,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(task.text);
@@ -24,7 +25,7 @@ export default function TaskItem({
   if (isEditing) {
     return (
       <div
-        className="flex items-center p-4 rounded-xl border border-purple-500 shadow-sm
+        className="flex items-center p-2 rounded-xl border border-purple-500 shadow-sm
                     dark:bg-gray-800 bg-white"
       >
         <input
@@ -54,11 +55,24 @@ export default function TaskItem({
 
   return (
     <div
-      className={`flex items-center p-4 rounded-xl border transition-all 
-                ${task.completed ? "opacity-60" : ""} 
-                dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
-                bg-white border-gray-200 hover:border-gray-300`}
+      className={`group flex items-center p-2 rounded-xl border transition-all 
+              ${task.completed ? "opacity-60" : ""} 
+              dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600
+              bg-white border-gray-200 hover:border-gray-300`}
     >
+      <div
+        {...dragHandleProps}
+        className="
+    cursor-move p-1 mr-2 text-gray-500 
+    opacity-0 w-0 overflow-hidden pointer-events-none
+    group-hover:opacity-100 group-hover:w-6 group-hover:pointer-events-auto
+    transition-all duration-300 ease-in-out
+  "
+        aria-label="Drag handle"
+      >
+        <Menu size={14} />
+      </div>
+
       <button
         className={`w-5 h-5 flex items-center justify-center rounded-full border ${
           task.completed

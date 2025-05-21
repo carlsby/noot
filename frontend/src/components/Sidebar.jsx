@@ -47,7 +47,7 @@ export default function Sidebar({
 
       <div className="mt-auto">
         <AddCategoryForm addCategory={addCategory} />
-        <CodeAreaButton setCodeMode={setCodeMode}  setSelectedCategory={setSelectedCategory} />
+        {/* <CodeAreaButton setCodeMode={setCodeMode}  setSelectedCategory={setSelectedCategory} /> */}
       </div>
     </div>
   );

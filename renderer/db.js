@@ -1,31 +1,33 @@
+const { app } = require("electron");
 const path = require("path");
 const Datastore = require("nedb");
+const fs = require("fs");
 const logger = require("./logger");
 
-// Skapa data-mappen om den inte finns (lägg till fs)
-const fs = require("fs");
-const dataDir = path.join(process.cwd(), "data");
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir);
+const userDataDir = path.join(app.getPath("userData"), "Noot_save");
+
+if (!fs.existsSync(userDataDir)) {
+  fs.mkdirSync(userDataDir);
 }
 
 const categoriesDB = new Datastore({
-  filename: path.join(dataDir, "categories.db"),
+  filename: path.join(userDataDir, "categories.db"),
   autoload: true,
 });
 const tasksDB = new Datastore({
-  filename: path.join(dataDir, "tasks.db"),
+  filename: path.join(userDataDir, "tasks.db"),
   autoload: true,
 });
 const colorModeDB = new Datastore({
-  filename: path.join(dataDir, "color.db"),
+  filename: path.join(userDataDir, "color.db"),
   autoload: true,
 });
 const selectedCategoryDB = new Datastore({
-  filename: path.join(dataDir, "selectedCategory.db"),
+  filename: path.join(userDataDir, "selectedCategory.db"),
   autoload: true,
 });
 
+const timestamp = new Date().toISOString();
 
 // Funktioner för kategorier
 
@@ -40,18 +42,30 @@ function getCategories() {
 
 function addCategory(cat) {
   return new Promise((resolve, reject) => {
-    categoriesDB.insert(cat, (err, newDoc) => {
+    const timestamp = new Date().toISOString();
+    const categoryWithTimestamps = {
+      ...cat,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+    categoriesDB.insert(categoryWithTimestamps, (err, newDoc) => {
       if (err) reject(err);
       else resolve(newDoc);
     });
   });
 }
 
+
 function updateCategory(id, update) {
   return new Promise((resolve, reject) => {
+    const updateWithTimestamp = {
+      ...update,
+      updatedAt: new Date().toISOString(),
+    };
+
     categoriesDB.update(
       { _id: id },
-      { $set: update },
+      { $set: updateWithTimestamp },
       {},
       (err, numUpdated) => {
         if (err) reject(err);
@@ -60,6 +74,7 @@ function updateCategory(id, update) {
     );
   });
 }
+
 
 function deleteCategory(id) {
   logger.info(`Deleting category with id: ${id}`);
@@ -116,8 +131,6 @@ function clearSelectedCategory() {
   });
 }
 
-
-
 // Funktioner för tasks
 
 function getTasks() {
@@ -131,21 +144,89 @@ function getTasks() {
 
 function addTask(task) {
   return new Promise((resolve, reject) => {
-    tasksDB.insert(task, (err, newDoc) => {
-      if (err) reject(err);
-      else resolve(newDoc);
+    tasksDB
+      .find({})
+      .sort({ order: -1 })
+      .limit(1)
+      .exec((err, docs) => {
+        if (err) return reject(err);
+
+        // Defensive: treat null order as -1 so it doesn't break maxOrder calculation
+        const maxOrder =
+          docs.length > 0 && typeof docs[0].order === "number" && docs[0].order >= 0
+            ? docs[0].order
+            : -1;
+
+        const timestamp = new Date().toISOString();
+        const taskWithTimestampsAndOrder = {
+          ...task,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+          order: maxOrder + 1,
+        };
+
+        tasksDB.insert(taskWithTimestampsAndOrder, (err2, newDoc) => {
+          if (err2) return reject(err2);
+
+          if (newDoc.categoryId) {
+            categoriesDB.update(
+              { _id: newDoc.categoryId },
+              { $set: { updatedAt: new Date().toISOString() } },
+              {},
+              (catErr) => {
+                if (catErr) return reject(catErr);
+                resolve(newDoc);
+              }
+            );
+          } else {
+            resolve(newDoc);
+          }
+        });
+      });
+  });
+}
+
+
+function updateMultipleTasksOrder(tasks) {
+  if (!Array.isArray(tasks)) {
+    console.error("Expected an array of tasks but got:", tasks);
+    throw new TypeError("Expected an array of tasks");
+  }
+
+  return Promise.all(
+    tasks.map((task) => updateTask(task._id, { order: task.order }))
+  );
+}
+
+
+
+function updateTask(id, update) {
+  return new Promise((resolve, reject) => {
+    const updateWithTimestamp = {
+      ...update,
+      updatedAt: new Date().toISOString(),
+    };
+
+    tasksDB.update({ _id: id }, { $set: updateWithTimestamp }, {}, (err, numUpdated) => {
+      if (err) return reject(err);
+
+      if (update.categoryId) {
+        categoriesDB.update(
+          { _id: update.categoryId },
+          { $set: { updatedAt: new Date().toISOString() } },
+          {},
+          (catErr) => {
+            if (catErr) return reject(catErr);
+            resolve(numUpdated);
+          }
+        );
+      } else {
+        resolve(numUpdated);
+      }
     });
   });
 }
 
-function updateTask(id, update) {
-  return new Promise((resolve, reject) => {
-    tasksDB.update({ _id: id }, { $set: update }, {}, (err, numUpdated) => {
-      if (err) reject(err);
-      else resolve(numUpdated);
-    });
-  });
-}
 
 function deleteTask(id) {
   return new Promise((resolve, reject) => {
@@ -194,5 +275,6 @@ module.exports = {
   setColorMode,
   getSelectedCategory,
   setSelectedCategory,
-  clearSelectedCategory
+  clearSelectedCategory,
+  updateMultipleTasksOrder
 };
