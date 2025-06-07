@@ -14,9 +14,9 @@ export default function AddCategoryForm({ addCategory }) {
     <div className="flex items-center">
       <input
         type="text"
-        className="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:border-purple-500 text-sm
+        className="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:border-[#381D5C] text-sm
                   dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400
-                  bg-white border-gray-200 text-gray-900 placeholder-gray-500 w-full
+                  bg-white border-gray-200 text-gray-900 placeholder-gray-500 w-full h-[35px]
                   transition-colors"
         placeholder="Ny kategori"
         value={newCategoryName}
@@ -24,7 +24,7 @@ export default function AddCategoryForm({ addCategory }) {
         onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
       />
       <button
-        className="ml-2 w-8 h-8 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center transition-colors"
+        className="ml-2 w-8 h-[35px] bg-[#381D5C] hover:bg-[#402169] text-white rounded-lg flex items-center justify-center transition-colors"
         onClick={handleAddCategory}
       >
         <Plus size={18} />

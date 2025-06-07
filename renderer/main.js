@@ -53,10 +53,24 @@ function setupIpcHandlers() {
   ipcMain.handle("toggle-task-completion", async (_, id) => {
     const tasks = await db.getTasks();
     const task = tasks.find((t) => t._id === id);
-    if (task) {
-      await db.updateTask(id, { completed: !task.completed });
-    }
-    return await db.getTasks();
+    if (!task) return null;
+
+    const newCompleted = !task.completed;
+
+    const targetGroup = tasks.filter((t) => t.completed === newCompleted);
+    const maxOrder =
+      targetGroup.length > 0
+        ? Math.max(...targetGroup.map((t) => t.order))
+        : -1;
+
+    await db.updateTask(id, {
+      completed: newCompleted,
+      order: maxOrder + 1,
+    });
+
+    const allTasks = await db.getTasks();
+    const updatedTask = allTasks.find((t) => t._id === id);
+    return updatedTask;
   });
 
   ipcMain.handle("delete-task", async (_, id) => {
@@ -85,9 +99,8 @@ function setupIpcHandlers() {
   });
 
   ipcMain.handle("update-tasks-order", async (_, tasks) => {
-  return await db.updateMultipleTasksOrder(tasks);
-});
-
+    return await db.updateMultipleTasksOrder(tasks);
+  });
 }
 
 function createWindow() {

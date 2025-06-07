@@ -3,7 +3,7 @@ import React from "react";
 export default function CodeAreaButton({ setCodeMode, setSelectedCategory }) {
   return (
     <button
-      className="relative inline-flex items-center justify-center p-0.5 mt-4 me-2 w-full overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-0 focus:outline-none"
+      className="relative inline-flex items-center justify-center p-0.5 mt-4 me-2 w-full overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-[#402169] to-blue-500 group-hover:from-[#402169] group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-0 focus:outline-none"
       onClick={() => {
         setCodeMode(true);
         setSelectedCategory(false);

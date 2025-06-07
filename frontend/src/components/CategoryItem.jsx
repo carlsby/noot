@@ -31,7 +31,7 @@ export default function CategoryItem({
       <div className="flex items-center p-1">
         <input
           type="text"
-          className="flex-1 px-3 py-2 rounded-lg border border-purple-500 focus:outline-none
+          className="flex-1 px-3 py-2 rounded-lg border border-[#381D5C] focus:outline-none
                     dark:bg-gray-800 dark:text-white bg-white text-gray-900"
           value={editText}
           onChange={(e) => setEditText(e.target.value)}
@@ -39,7 +39,7 @@ export default function CategoryItem({
           autoFocus
         />
         <button
-          className="ml-2 text-purple-500 hover:text-purple-600"
+          className="ml-2 text-[#381D5C] hover:text-[#402169]"
           onClick={handleSave}
         >
           <Save size={16} />
@@ -95,7 +95,7 @@ export default function CategoryItem({
           <span
             className={`ml-auto px-2 py-0.5 rounded-full text-xs ${
               selectedCategory === category._id
-                ? "bg-purple-500 text-white"
+                ? "bg-[#381D5C] text-white"
                 : "dark:bg-gray-700 dark:text-gray-300 bg-gray-200 text-gray-600"
             }`}
           >
