@@ -39,7 +39,7 @@ export default function AddTaskForm({ addTask }) {
             dark:bg-gray-800 dark:text-white dark:placeholder-gray-400
             bg-gray-100 text-gray-900 placeholder-gray-500 h-[35px]
             transition-colors"
-        placeholder="Lägg till uppgift..."
+        placeholder="Lägg till anteckning..."
         value={newTaskText}
         onChange={(e) => setNewTaskText(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleAddTask()}

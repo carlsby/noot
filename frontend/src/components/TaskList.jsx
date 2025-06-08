@@ -9,6 +9,7 @@ export default function TaskList({
   toggleTaskCompletion,
   deleteTask,
   updateTaskOrder,
+  categoryColor,
 }) {
   const [localTasks, setLocalTasks] = useState([]);
   const [editingTaskId, setEditingTaskId] = useState(null);
@@ -72,10 +73,14 @@ export default function TaskList({
     return (
       <div className="text-gray-500 dark:text-gray-400 text-center py-12">
         <div className="flex flex-col items-center justify-center h-full">
-          <NotebookPen size={40} className="mb-4" />
-          <p className="text-lg dark:text-gray-300">Inga uppgifter ännu</p>
+          <NotebookPen
+            style={{ color: categoryColor }}
+            size={40}
+            className="mb-4"
+          />
+          <p className="text-lg dark:text-gray-300">Inga anteckningar ännu</p>
           <p className="text-sm dark:text-gray-400">
-            Lägg till en uppgift nedan
+            Lägg till en anteckning nedan
           </p>
         </div>
       </div>
@@ -93,14 +98,13 @@ export default function TaskList({
       >
         {(provided) => (
           <ul
-            className="space-y-3"
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
             {localTasks.map((task, index) => (
               <Draggable key={task._id} draggableId={task._id} index={index}>
                 {(provided, snapshot) => (
-                  <li ref={provided.innerRef} {...provided.draggableProps}>
+                  <li ref={provided.innerRef} {...provided.draggableProps} className="mb-1">
                     <TaskItem
                       task={task}
                       updateTask={updateTask}

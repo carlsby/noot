@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Edit, Trash, Save, X } from "lucide-react";
+import { Edit, Trash, Save, X, NotebookPen } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";
 
 export default function CategoryItem({
@@ -57,43 +57,39 @@ export default function CategoryItem({
   return (
     <>
       <div
-        className={`flex items-center ${
+        className={`flex items-center p-2 ${
           selectedCategory === category._id
             ? "dark:bg-gray-800 bg-white shadow-sm"
             : "dark:hover:bg-gray-800/50 hover:bg-white/50 transition-all"
         }`}
       >
         <button
-          className="flex items-center flex-1 px-3 py-2 rounded-lg text-left"
+          className="flex items-center flex-1 rounded-lg text-left gap-2"
           onClick={() => {
             setSelectedCategory(category._id);
             setCodeMode(false);
           }}
         >
-          <div
-            className="w-3 h-3 rounded-full mr-3"
-            style={{ backgroundColor: category.color }}
-          ></div>
-          <div className="relative group max-w-[120px] h-[20px]">
+          <NotebookPen style={{ color: category.color }} size={18} />
+          <div className="relative group max-w-[170px] overflow-hidden">
             <span
               className={`
-      inline-block
-      whitespace-nowrap
-      overflow-visible
-      group-hover:overflow-hidden
-      group-hover:text-ellipsis
-      group-hover:w-full
-      transition-all
-      ${selectedCategory === category._id ? "font-medium" : ""}
-      dark:text-white text-gray-900
-    `}
+                          block
+                          truncate
+                          whitespace-nowrap
+                          overflow-hidden
+                          text-sm
+                          ${selectedCategory === category._id ? "font-medium" : ""}
+                          dark:text-white text-gray-900
+                        `}
+              title={category.name}
             >
               {category.name}
             </span>
           </div>
 
           <span
-            className={`ml-auto px-2 py-0.5 rounded-full text-xs ${
+            className={`ml-auto px-2 rounded-full text-xs ${
               selectedCategory === category._id
                 ? "bg-[#381D5C] text-white"
                 : "dark:bg-gray-700 dark:text-gray-300 bg-gray-200 text-gray-600"
@@ -102,9 +98,9 @@ export default function CategoryItem({
             {getTaskCount(category._id)}
           </span>
         </button>
-        <div className="hidden group-hover:flex pr-2 transition-all">
+        <div className="hidden group-hover:flex transition-all">
           <button
-            className="ml-1 text-gray-500 hover:text-gray-600 p-1"
+            className="ml-1 text-gray-500 hover:text-black dark:hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
               setIsEditing(true);
@@ -113,7 +109,7 @@ export default function CategoryItem({
             <Edit size={14} />
           </button>
           <button
-            className="ml-1 text-gray-500 hover:text-red-500 p-1"
+            className="ml-1 text-gray-500 hover:text-red-500"
             onClick={(e) => {
               e.stopPropagation();
               setShowConfirm(true);

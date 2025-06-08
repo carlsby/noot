@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CheckCircle,
   Circle,
@@ -12,6 +12,7 @@ import {
   Asterisk,
   Minus,
 } from "lucide-react";
+import { ConfirmModal } from "./ConfirmModal";
 
 export default function TaskItem({
   task,
@@ -24,6 +25,9 @@ export default function TaskItem({
 }) {
   const isEditing = editingTaskId === task._id;
   const [editText, setEditText] = useState(task.text);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const editContainerRef = useRef(null);
 
   const handleSave = () => {
     if (editText.trim() === "") return;
@@ -35,10 +39,31 @@ export default function TaskItem({
     setEditText(task.text);
     setEditingTaskId(null);
   };
+useEffect(() => {
+  if (!isEditing) return;
+
+  const handleClickOutside = (event) => {
+    if (
+      editContainerRef.current &&
+      !editContainerRef.current.contains(event.target)
+    ) {
+      handleSave();
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [isEditing, editText]);
+
 
   if (isEditing) {
     return (
-      <div className="flex items-center border-b border-gray-500 py-1 shadow-sm text-sm">
+      <div
+        ref={editContainerRef}
+        className="flex items-center border-b border-gray-500 py-1 shadow-sm text-sm"
+      >
         <div className="flex items-center px-2">
           <button
             onClick={() => {
@@ -82,37 +107,49 @@ export default function TaskItem({
   }
 
   return (
-    <div
-      {...dragHandleProps}
-      className={`group flex items-center py-1 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-700 text-sm bg-transparent ${
-        task.completed ? "opacity-60" : ""
-      }`}
-      aria-label="Drag handle"
-    >
-      <div className="flex items-center px-2 opacity-40 group-hover:opacity-70 transition-opacity">
-        <Minus size={16} className="text-gray-400" />
-      </div>
-
-      <span
-        onDoubleClick={() => setEditingTaskId(task._id)}
-        title="Double-click to edit"
-        className={`flex-1 cursor-pointer ${
-          task.completed
-            ? "line-through text-gray-500 dark:text-gray-500"
-            : "text-gray-900 dark:text-white"
+    <>
+      <div
+        {...dragHandleProps}
+        className={`group flex items-center py-1 border-b border-transparent hover:border-gray-300 dark:hover:border-gray-700 text-sm bg-transparent ${
+          task.completed ? "opacity-60" : ""
         }`}
+        aria-label="Drag handle"
       >
-        {task.text}
-      </span>
+        <div className="flex items-center px-2 opacity-40 group-hover:opacity-70 transition-opacity">
+          <Minus size={16} className="text-gray-400" />
+        </div>
 
-      <div className="hidden group-hover:flex items-center pe-1">
-        <button
-          className="ml-1 text-gray-500 hover:text-red-800 dark:hover:text-red-500"
-          onClick={() => deleteTask(task._id)}
+        <span
+          onDoubleClick={() => setEditingTaskId(task._id)}
+          title="Double-click to edit"
+          className={`flex-1 cursor-pointer ${
+            task.completed
+              ? "line-through text-gray-500 dark:text-gray-500"
+              : "text-gray-900 dark:text-white"
+          }`}
         >
-          <Trash size={16} />
-        </button>
+          {task.text}
+        </span>
+
+        <div className="hidden group-hover:flex items-center pe-1">
+          <button
+            className="ml-1 text-gray-500 hover:text-red-800 dark:hover:text-red-500"
+            onClick={() => setShowConfirm(true)}
+          >
+            <Trash size={16} />
+          </button>
+        </div>
       </div>
-    </div>
+      {showConfirm && (
+        <ConfirmModal
+          message={`Är du säker på att du vill ta bort anteckningen "${task.text}"?`}
+          onConfirm={() => {
+            deleteTask(task._id);
+            setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
+    </>
   );
 }
