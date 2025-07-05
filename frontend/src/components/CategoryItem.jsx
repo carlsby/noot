@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { Edit, Trash, Save, X } from "lucide-react";
 import { ConfirmModal } from "./ConfirmModal";

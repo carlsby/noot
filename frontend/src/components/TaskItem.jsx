@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useRef, useState } from "react"
 import { CheckCircle, Circle, Edit, Trash, Save, X, GripVertical } from 'lucide-react'
 import { ConfirmModal } from "./ConfirmModal"
