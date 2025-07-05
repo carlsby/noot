@@ -104,7 +104,7 @@ export default function TaskList({
             {localTasks.map((task, index) => (
               <Draggable key={task._id} draggableId={task._id} index={index}>
                 {(provided, snapshot) => (
-                  <li ref={provided.innerRef} {...provided.draggableProps} className="mb-1">
+                  <li ref={provided.innerRef} {...provided.draggableProps} className="mb-2">
                     <TaskItem
                       task={task}
                       updateTask={updateTask}

@@ -1,8 +1,11 @@
+"use client"
+
 import { useState } from "react"
-import { Plus } from "lucide-react"
+import { Plus, FolderPlus } from "lucide-react"
 
 export default function AddCategoryForm({ addCategory }) {
   const [newCategoryName, setNewCategoryName] = useState("")
+  const [isFocused, setIsFocused] = useState(false)
 
   const handleAddCategory = () => {
     if (newCategoryName.trim() === "") return
@@ -11,23 +14,31 @@ export default function AddCategoryForm({ addCategory }) {
   }
 
   return (
-    <div className="flex items-center">
+    <div
+      className={`flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border transition-all duration-200 ${
+        isFocused
+          ? "border-purple-300 dark:border-purple-600 bg-white dark:bg-slate-700"
+          : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+      }`}
+    >
+      <div className="flex-shrink-0">
+        <FolderPlus size={16} className="text-slate-400" />
+      </div>
       <input
         type="text"
-        className="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:border-[#381D5C] text-sm
-                  dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-400
-                  bg-white border-gray-200 text-gray-900 placeholder-gray-500 w-full h-[35px]
-                  transition-colors"
+        className="flex-1 bg-transparent border-none outline-none text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 text-sm"
         placeholder="Ny kategori"
         value={newCategoryName}
         onChange={(e) => setNewCategoryName(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       <button
-        className="ml-2 w-8 h-[35px] bg-[#381D5C] hover:bg-[#402169] text-white rounded-lg flex items-center justify-center transition-colors"
+        className="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-sm"
         onClick={handleAddCategory}
       >
-        <Plus size={18} />
+        <Plus size={14} />
       </button>
     </div>
   )

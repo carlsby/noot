@@ -1,6 +1,6 @@
-import TaskList from "./TaskList";
-import AddTaskForm from "./AddTaskForm";
-import { NotebookPen } from "lucide-react";
+import TaskList from "./TaskList"
+import AddTaskForm from "./AddTaskForm"
+import { NotebookPen } from 'lucide-react'
 
 export default function TaskArea({
   currentCategory,
@@ -12,40 +12,43 @@ export default function TaskArea({
   updateTaskOrder,
 }) {
   return (
-    <div
-      className="flex-1 flex flex-col transition-colors duration-300 dark:bg-gray-900 bg-white"
-    >
-      <div
-        className="px-8 py-2 lg:py-2 border-b transition-colors duration-300 dark:border-gray-700 border-gray-200 "
-      >
-        <div className="flex items-center ms-6 lg:ms-0 gap-2">
-          <NotebookPen
-            style={{ color: currentCategory?.color }}
-          />
-          <h1 className="text-2xl font-medium dark:text-white text-gray-900">
-            {currentCategory?.name}
-          </h1>
+    <div className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+        <div className="px-8 py-4">
+          <div className="flex items-center gap-4 ms-6 lg:ms-0">
+            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <NotebookPen style={{ color: currentCategory?.color }} size={24} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                {currentCategory?.name}
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
+                {filteredTasks.length} {filteredTasks.length === 1 ? "anteckning" : "anteckningar"}
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 hidden lg:block">
-          {filteredTasks.length}{" "}
-          {filteredTasks.length === 1 ? "anteckning" : "anteckningar"}
-        </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6">
-        <TaskList
-          tasks={filteredTasks}
-          updateTask={updateTask}
-          toggleTaskCompletion={toggleTaskCompletion}
-          deleteTask={deleteTask}
-          updateTaskOrder={updateTaskOrder}
-          categoryColor={currentCategory?.color}
-        />
+      <div className="flex-1 overflow-y-auto px-8 py-6">
+        <div>
+          <TaskList
+            tasks={filteredTasks}
+            updateTask={updateTask}
+            toggleTaskCompletion={toggleTaskCompletion}
+            deleteTask={deleteTask}
+            updateTaskOrder={updateTaskOrder}
+            categoryColor={currentCategory?.color}
+          />
+        </div>
       </div>
 
-      <div className="p-6 border-t transition-colors duration-300 dark:border-gray-700 border-gray-200">
-        <AddTaskForm addTask={addTask} />
+      <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 px-8 py-6 h-[100px]">
+        <div className="max-w-3xl mx-auto">
+          <AddTaskForm addTask={addTask} />
+        </div>
       </div>
     </div>
-  );
+  )
 }

@@ -24,7 +24,6 @@ export default function CodeArea() {
 
   return (
     <div className="flex-1 flex flex-col transition-colors duration-300 dark:bg-gray-900 bg-white">
-      {/* Header */}
       <div className="px-8 py-6 border-b transition-colors duration-300 dark:border-gray-700 border-gray-200">
         <Code />
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
@@ -32,7 +31,6 @@ export default function CodeArea() {
         </p>
       </div>
 
-      {/* Code editor area */}
       <div className="flex-1 overflow-y-auto">
         <textarea
           ref={textareaRef}
