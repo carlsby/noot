@@ -64,8 +64,8 @@ export default function Sidebar({
     <>
       <button
         onClick={toggleMobileMenu}
-        className="lg:hidden fixed top-3 left-4 z-50"
-        aria-label="Open menu"
+        className="lg:hidden fixed top-7 left-4 z-50"
+        aria-label="Öppna meny"
       >
         <Menu size={24} className="text-gray-700 dark:text-gray-300" />
       </button>
