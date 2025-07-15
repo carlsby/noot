@@ -15,7 +15,6 @@ Follow these steps to install and run **Noot** locally on your machine.
 ```bash
 # Clone the repository
 git clone https://github.com/carlsby/noot.git
-cd todo
 
 # Install root dependencies
 npm install
