@@ -1,8 +1,7 @@
-"use client";
-
 import { Eraser, Paintbrush, Save } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
+import { ConfirmClearModal } from "../../shared/ConfirmClearModal";
 
 export default function PaintArea({
   setSelectedPainting,
@@ -12,10 +11,11 @@ export default function PaintArea({
   const canvasRef = useRef(null);
   const [isErasing, setIsErasing] = useState(false);
   const colorInputRef = useRef(null);
-  // Removed showClearModal as it was unused
-  // Updated state for toast message and its visibility
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const autosaveTimeoutRef = useRef(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     const loadStrokes = async () => {
@@ -29,18 +29,22 @@ export default function PaintArea({
           console.error("Kunde inte ladda strokes:", error);
         }
       }
-      await canvasRef.current.eraseMode(isErasing);
     };
     loadStrokes();
-  }, [selectedPainting, isErasing]);
+  }, [selectedPainting]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    canvasRef.current.eraseMode(isErasing);
+  }, [isErasing]);
 
   const showTemporaryToast = (message) => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => {
-      setShowToast(false); // Start fade out
-      setTimeout(() => setToastMessage(""), 300); // Clear message after fade out
-    }, 3000); // Message visible for 3 seconds
+      setShowToast(false);
+      setTimeout(() => setToastMessage(""), 300);
+    }, 3000);
   };
 
   const saveDrawing = async () => {
@@ -48,7 +52,6 @@ export default function PaintArea({
     const paths = await canvasRef.current.exportPaths();
     const strokes = JSON.stringify(paths);
     updatePainting(selectedPainting._id, selectedPainting.name, strokes);
-    showTemporaryToast("Målning sparad!");
   };
 
   const clearCanvas = () => {
@@ -73,15 +76,39 @@ export default function PaintArea({
     setIsErasing(newErasing);
     canvasRef.current.eraseMode(newErasing);
     showTemporaryToast(
-      newErasing ? "Suddgummi aktiverat!" : "Pensel aktiverad!"
+      newErasing ? (
+        <div className="flex items-center gap-2">
+          <Eraser /> Suddgummi aktiverat!
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <Paintbrush /> Pensel aktiverad!
+        </div>
+      )
     );
+  };
+
+  const handleStroke = () => {
+    setHasUnsavedChanges(true);
+
+    if (autosaveTimeoutRef.current) {
+      clearTimeout(autosaveTimeoutRef.current);
+    }
+
+    autosaveTimeoutRef.current = setTimeout(() => {
+      if (hasUnsavedChanges) {
+        saveDrawing();
+        setHasUnsavedChanges(false);
+        showTemporaryToast("Autosparad!");
+      }
+    }, 5000);
   };
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen relative">
       {selectedPainting && (
         <>
-          <div className="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+          <div className="sticky top-0 z-10 h-[80px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
             <div className="px-8 py-4">
               <div className="flex items-center gap-4 ms-6 lg:ms-0">
                 <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
@@ -112,6 +139,8 @@ export default function PaintArea({
                       backgroundColor: "transparent",
                     }}
                     canvasColor="transparent"
+                    onStroke={handleStroke}
+                    className="cursor-crosshair"
                   />
                 </div>
               </div>
@@ -143,7 +172,7 @@ export default function PaintArea({
               </div>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={clearCanvas}
+                  onClick={() => setShowConfirm(true)}
                   className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200 font-medium"
                   title="Rensa målning"
                 >
@@ -161,7 +190,14 @@ export default function PaintArea({
                   <Eraser />
                 </button>
                 <button
-                  onClick={saveDrawing}
+                  onClick={() => {
+                    saveDrawing();
+                    showTemporaryToast(
+                      <div className="flex gap-2 items-center">
+                        <Save /> Sparad
+                      </div>
+                    );
+                  }}
                   className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium flex items-center gap-2"
                   title="Spara målning"
                 >
@@ -173,7 +209,7 @@ export default function PaintArea({
         </>
       )}
       <div
-        className={`fixed top-24 right-7 dark:bg-gray-700 text-white px-6 py-3 rounded-lg shadow-lg font-semibold
+        className={`fixed top-24 right-4 bg-purple-700 text-white px-6 py-3 rounded-lg shadow-lg font-semibold
           transition-opacity duration-300 ${
             showToast
               ? "opacity-100 pointer-events-auto"
@@ -184,6 +220,17 @@ export default function PaintArea({
       >
         {toastMessage}
       </div>
+
+      {showConfirm && (
+        <ConfirmClearModal
+          message={`Är du säker på att du vill rensa målningen?`}
+          onConfirm={() => {
+            clearCanvas();
+            setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </div>
   );
 }

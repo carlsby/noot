@@ -13,7 +13,7 @@ export default function TaskArea({
 }) {
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen">
-      <div className="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+      <div className="sticky top-0 z-10 h-[80px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
         <div className="px-8 py-4">
           <div className="flex items-center gap-4 ms-6 lg:ms-0">
             <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">

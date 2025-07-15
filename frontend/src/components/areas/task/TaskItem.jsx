@@ -92,7 +92,7 @@ export default function TaskItem({
 
           <div className="flex items-center gap-1">
             <button
-              className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
+              className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
               onClick={handleSave}
               title="Spara"
             >

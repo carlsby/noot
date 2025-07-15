@@ -76,8 +76,8 @@ export default function PaintItem({
 
   if (isEditing) {
     return (
-      <div className="mx-2 mb-1">
-        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
+      <div>
+        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
           <div
             className="w-2 h-2 rounded-full flex-shrink-0"
             style={{ backgroundColor: painting.color }}
@@ -96,7 +96,7 @@ export default function PaintItem({
           />
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
-              className="w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-xl transition-all duration-200"
+              className="w-8 h-8 flex items-center justify-center text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all duration-200"
               onClick={handleSave}
             >
               <Save size={14} />

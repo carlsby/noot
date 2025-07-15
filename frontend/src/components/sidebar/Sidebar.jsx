@@ -128,7 +128,7 @@ export default function Sidebar({
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="hidden lg:flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+          <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3 w-full">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center">
                 <img
