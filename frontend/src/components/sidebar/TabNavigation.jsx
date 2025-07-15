@@ -1,42 +1,46 @@
-import { NotepadText, Paintbrush } from "lucide-react"
+import { NotepadText, Paintbrush } from "lucide-react";
 
 export default function TabNavigation({
   activeTab,
   setActiveTab,
   setPaintMode,
   paintings,
-  setSelectedPainting
+  setSelectedPainting,
 }) {
   const tabs = [
     {
       id: "note",
       label: "Anteckningar",
       icon: NotepadText,
-      action: false
+      action: false,
     },
     {
       id: "paint",
       label: "Målningar",
       icon: Paintbrush,
-      action: true
+      action: true,
     },
-  ]
+  ];
 
   const toggleTab = (tab) => {
-    setPaintMode(tab.action)
-    setActiveTab(tab.id)
+    setPaintMode(tab.action);
+    setActiveTab(tab.id);
 
     if (tab.id === "paint" && paintings.length > 0) {
-      setSelectedPainting(paintings[0])
+      const sorted = [...paintings].sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+      console.log(sorted)
+      setSelectedPainting(sorted[0]);
     }
-  }
+  };
 
   return (
     <div className="border-b border-slate-200 dark:border-slate-700">
       <div className="flex bg-slate-100 dark:bg-slate-800 gap-1">
         {tabs.map((tab) => {
-          const Icon = tab.icon
-          const isActive = activeTab === tab.id
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
 
           return (
             <button
@@ -60,9 +64,9 @@ export default function TabNavigation({
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
               )}
             </button>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

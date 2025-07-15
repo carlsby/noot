@@ -180,6 +180,7 @@ export default function Sidebar({
                   setSelectedPainting(painting);
                   closeMobileMenu();
                 }}
+                selectedPainting={selectedPainting}
                 updatePainting={updatePainting}
                 deletePainting={deletePainting}
               />

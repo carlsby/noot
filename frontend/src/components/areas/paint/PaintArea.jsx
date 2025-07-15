@@ -1,4 +1,4 @@
-import { Eraser, Paintbrush, Save } from "lucide-react";
+import { Eraser, Paintbrush, Redo, Save, Undo } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import { ConfirmClearModal } from "../../shared/ConfirmClearModal";
@@ -9,13 +9,18 @@ export default function PaintArea({
   updatePainting,
 }) {
   const canvasRef = useRef(null);
-  const [isErasing, setIsErasing] = useState(false);
+  const undoRef = useRef(null);
+  const redoRef = useRef(null);
+  const saveDrawingRef = useRef(null);
   const colorInputRef = useRef(null);
+  const autosaveTimeoutRef = useRef(null);
+  const [isErasing, setIsErasing] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const autosaveTimeoutRef = useRef(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
 
   useEffect(() => {
     const loadStrokes = async () => {
@@ -25,18 +30,24 @@ export default function PaintArea({
         try {
           const parsedStrokes = JSON.parse(selectedPainting.strokes);
           await canvasRef.current.loadPaths(parsedStrokes);
+
+          setUndoStack([parsedStrokes]);
+          setRedoStack([]);
         } catch (error) {
           console.error("Kunde inte ladda strokes:", error);
+          setUndoStack([]);
+          setRedoStack([]);
         }
+      } else {
+        // Om ingen strokes finns, nollställ stackar
+        setUndoStack([]);
+        setRedoStack([]);
       }
     };
-    loadStrokes();
-  }, [selectedPainting]);
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    canvasRef.current.eraseMode(isErasing);
-  }, [isErasing]);
+    // Ladda strokes bara när selectedPainting._id ändras, dvs ny målning
+    loadStrokes();
+  }, [selectedPainting?._id]);
 
   const showTemporaryToast = (message) => {
     setToastMessage(message);
@@ -47,17 +58,18 @@ export default function PaintArea({
     }, 3000);
   };
 
-  const saveDrawing = async () => {
+  const saveDrawing = async (paintingId = selectedPainting._id) => {
     if (!canvasRef.current) return;
     const paths = await canvasRef.current.exportPaths();
     const strokes = JSON.stringify(paths);
-    updatePainting(selectedPainting._id, selectedPainting.name, strokes);
+    updatePainting(paintingId, selectedPainting.name, strokes);
   };
 
   const clearCanvas = () => {
     if (!canvasRef.current) return;
     canvasRef.current.clearCanvas();
     showTemporaryToast("Målningen rensad!");
+    console.log("bajs");
   };
 
   const handleColorChange = (newColor) => {
@@ -88,21 +100,107 @@ export default function PaintArea({
     );
   };
 
-  const handleStroke = () => {
+  const handleStroke = async () => {
+    if (!canvasRef.current) return;
+
+    // Hämta nuvarande penseldrag
+    const paths = await canvasRef.current.exportPaths();
+
+    // Lägg till i undo-stack, rensa redo-stack
+    setUndoStack((prev) => [...prev, paths]);
+    setRedoStack([]);
+
+    // Markera att det finns ändringar som inte sparats
     setHasUnsavedChanges(true);
 
+    // Om det redan finns en autosave-timer, nollställ den
     if (autosaveTimeoutRef.current) {
       clearTimeout(autosaveTimeoutRef.current);
     }
 
+    // Starta autosave efter 5 sek om inget nytt händer
+    const currentPaintingId = selectedPainting._id;
     autosaveTimeoutRef.current = setTimeout(() => {
       if (hasUnsavedChanges) {
-        saveDrawing();
+        saveDrawing(currentPaintingId);
         setHasUnsavedChanges(false);
         showTemporaryToast("Autosparad!");
       }
     }, 5000);
   };
+
+  const undo = async () => {
+    if (undoStack.length === 0 || !canvasRef.current) return;
+
+    // Ta senaste state från undoStack
+    const newUndoStack = [...undoStack];
+    const lastPaths = newUndoStack.pop();
+
+    // Spara current state i redoStack för framtida redo
+    const currentPaths = await canvasRef.current.exportPaths();
+    setRedoStack((prev) => [...prev, currentPaths]);
+
+    setUndoStack(newUndoStack);
+
+    // Ladda sista "förra" state eller tom canvas
+    const previousPaths =
+      newUndoStack.length > 0 ? newUndoStack[newUndoStack.length - 1] : [];
+    await canvasRef.current.clearCanvas();
+    if (previousPaths.length) {
+      await canvasRef.current.loadPaths(previousPaths);
+    }
+    showTemporaryToast("Ångra");
+  };
+
+  const redo = async () => {
+    if (redoStack.length === 0 || !canvasRef.current) return;
+
+    const newRedoStack = [...redoStack];
+    const nextPaths = newRedoStack.pop();
+
+    // Sparar aktuellea staten i undostack, för att kunna gå fram o tillbaka
+    const currentPaths = await canvasRef.current.exportPaths();
+    setUndoStack((prev) => [...prev, currentPaths]);
+
+    setRedoStack(newRedoStack);
+
+    await canvasRef.current.clearCanvas();
+    if (nextPaths.length) {
+      await canvasRef.current.loadPaths(nextPaths);
+    }
+    showTemporaryToast("Gör om");
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+        e.preventDefault();
+        undoRef.current();
+      } else if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === "y" || (e.shiftKey && e.key === "Z"))
+      ) {
+        e.preventDefault();
+        redoRef.current();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        saveDrawingRef.current();
+        showTemporaryToast(
+          <div className="flex gap-2 items-center">
+            <Save /> Sparad
+          </div>
+        );
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    undoRef.current = undo;
+    redoRef.current = redo;
+    saveDrawingRef.current = saveDrawing;
+  }, [undo, redo, saveDrawing]);
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen relative">
@@ -125,9 +223,8 @@ export default function PaintArea({
           <div className="flex-1 overflow-y-auto h-full relative">
             <div className="h-full">
               <div className="bg-white dark:bg-slate-800 h-full">
-                <div className="bg-slate-50 dark:bg-slate-900 h-full">
+                <div className="bg-slate-50 dark:bg-slate-900 h-full relative">
                   <ReactSketchCanvas
-                    key={selectedPainting?._id}
                     ref={canvasRef}
                     strokeWidth={4}
                     strokeColor={selectedPainting.color}
@@ -172,6 +269,34 @@ export default function PaintArea({
               </div>
               <div className="flex items-center gap-3">
                 <button
+                  onClick={undo}
+                  disabled={undoStack.length <= 1}
+                  className={`text-slate-600 p-1 rounded-lg transition-colors duration-200 font-medium
+                    ${
+                      undoStack.length <= 1
+                        ? "opacity-40 cursor-not-allowed dark:text-slate-600"
+                        : "dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    }`}
+                  title="Ångra (Ctrl + Z)"
+                >
+                  <Undo />
+                </button>
+
+                <button
+                  onClick={redo}
+                  disabled={redoStack.length === 0}
+                  className={`text-slate-600 p-1 rounded-lg transition-colors duration-200 font-medium
+                    ${
+                      redoStack.length === 0
+                        ? "opacity-40 cursor-not-allowed dark:text-slate-600"
+                        : "dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    }`}
+                  title="Gör om (Ctrl + Y)"
+                >
+                  <Redo />
+                </button>
+
+                <button
                   onClick={() => setShowConfirm(true)}
                   className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors duration-200 font-medium"
                   title="Rensa målning"
@@ -191,7 +316,8 @@ export default function PaintArea({
                 </button>
                 <button
                   onClick={() => {
-                    saveDrawing();
+                    const currentPaintingId = selectedPainting._id;
+                    saveDrawing(currentPaintingId);
                     showTemporaryToast(
                       <div className="flex gap-2 items-center">
                         <Save /> Sparad

@@ -7,6 +7,7 @@ export default function PaintItem({
   setSelectedPainting,
   deletePainting,
   updatePainting,
+  selectedPainting
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(painting.name);
@@ -72,7 +73,9 @@ export default function PaintItem({
     }
   }, [contextMenu.show]);
 
-  const isSelected = "";
+  const isSelected = selectedPainting._id === painting._id;
+
+  console.log(selectedPainting)
 
   if (isEditing) {
     return (
