@@ -4,7 +4,8 @@ export default function PaintList({
   paintings,
   selectedPainting,
   setSelectedPainting,
-  updatePainting
+  updatePainting,
+  deletePainting
 }) {
   paintings.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
@@ -18,6 +19,7 @@ export default function PaintList({
               selectedPainting={selectedPainting}
               setSelectedPainting={setSelectedPainting}
               updatePainting={updatePainting}
+              deletePainting={deletePainting}
             />
           </li>
         ))}

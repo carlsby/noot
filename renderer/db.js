@@ -318,34 +318,17 @@ function getPaintings() {
   });
 }
 
-function setSelectedPainting(paintingId) {
+
+function deletePainting(id) {
   return new Promise((resolve, reject) => {
-    selectedPaintingDB.update(
-      { _id: "selectedPainting" },
-      { _id: "selectedPainting", paintingId },
-      { upsert: true },
-      (err, numUpdated) => {
-        if (err) reject(err);
-        else resolve(numUpdated);
+    paintingsDB.remove({ _id: id }, {}, (err, numRemoved) => {
+      if (err) {
+        logger.error(`Error deleting painting: ${err}`);
+        reject(err);
+      } else {
+        logger.info(`Deleted painting: ${numRemoved}`);
+        resolve(numRemoved);
       }
-    );
-  });
-}
-
-function getSelectedPainting() {
-  return new Promise((resolve, reject) => {
-    selectedPaintingDB.findOne({ _id: "selectedPainting" }, (err, doc) => {
-      if (err) reject(err);
-      else resolve(doc?.paintingId || null);
-    });
-  });
-}
-
-function clearSelectedPainting() {
-  return new Promise((resolve, reject) => {
-    selectedPaintingDB.remove({ _id: "selectedPainting" }, {}, (err, numRemoved) => {
-      if (err) reject(err);
-      else resolve(numRemoved);
     });
   });
 }
@@ -369,4 +352,5 @@ module.exports = {
   addPainting,
   getPaintings,
   updatePainting,
+  deletePainting
 };

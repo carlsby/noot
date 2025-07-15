@@ -24,6 +24,7 @@ export default function Sidebar({
   selectedPainting,
   setSelectedPainting,
   updatePainting,
+  deletePainting
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("note");
@@ -180,6 +181,7 @@ export default function Sidebar({
                   closeMobileMenu();
                 }}
                 updatePainting={updatePainting}
+                deletePainting={deletePainting}
               />
             )}
           </div>

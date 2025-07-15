@@ -198,6 +198,16 @@ export default function App() {
     }
   };
 
+  const deletePainting = async (id) => {
+    const deletedPainting = await window.electronAPI.invoke(
+      "delete-painting",
+      id
+    );
+    if (deletedPainting) {
+      await fetchData();
+    }
+  };
+
   return (
     <div className="flex h-screen transition-colors duration-300 dark:bg-gray-900 bg-gray-100 dark:text-white text-gray-900">
       <Sidebar
@@ -213,12 +223,17 @@ export default function App() {
         updateCategory={updateCategory}
         updatePainting={updatePainting}
         deleteCategory={deleteCategory}
+        deletePainting={deletePainting}
         getTaskCount={getTaskCount}
         setPaintMode={setPaintMode}
         addPainting={addPainting}
       />
       {paintMode ? (
-        <PaintArea selectedPainting={selectedPainting} setSelectedPainting={setSelectedPainting} updatePainting={updatePainting} />
+        <PaintArea
+          selectedPainting={selectedPainting}
+          setSelectedPainting={setSelectedPainting}
+          updatePainting={updatePainting}
+        />
       ) : (
         <TaskArea
           currentCategory={getCurrentCategory()}

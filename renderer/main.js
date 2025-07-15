@@ -115,6 +115,11 @@ function setupIpcHandlers() {
     await db.updatePainting(id, { name, strokes });
     return await db.getPaintings();
   });
+
+    ipcMain.handle("delete-painting", async (_, id) => {
+    await db.deletePainting(id);
+    return true;
+  });
 }
 
 function createWindow() {
