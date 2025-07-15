@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import Sidebar from "./components/Sidebar";
-import TaskArea from "./components/TaskArea";
-import CodeArea from "./components/CodeArea";
+import Sidebar from "./components/sidebar/Sidebar";
+import TaskArea from "./components/areas/task/TaskArea";
+import PaintArea from "./components/areas/paint/PaintArea";
 
 export default function App() {
   const [categories, setCategories] = useState([]);
+  const [paintings, setPaintings] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedPainting, setSelectedPainting] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [codeMode, setCodeMode] = useState(false);
+  const [paintMode, setPaintMode] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -18,7 +20,9 @@ export default function App() {
   async function fetchData() {
     const cats = await window.electronAPI.invoke("get-categories");
     const tks = await window.electronAPI.invoke("get-tasks");
+    const pts = await window.electronAPI.invoke("get-paintings");
 
+    setPaintings(pts);
     setCategories(cats);
     setTasks(tks);
   }
@@ -174,22 +178,47 @@ export default function App() {
     return categories.find((c) => c._id === selectedCategory);
   };
 
+  // Lägg till målning via ipc
+  const addPainting = async (name) => {
+    const addedpainting = await window.electronAPI.invoke("add-painting", name);
+    if (addedpainting) {
+      setSelectedPainting(addedpainting);
+      await fetchData();
+    }
+  };
+
+  const updatePainting = async (id, name, strokes) => {
+    const updatedPai = await window.electronAPI.invoke("update-painting", {
+      id,
+      name,
+      strokes,
+    });
+    if (updatedPai) {
+      await fetchData();
+    }
+  };
+
   return (
     <div className="flex h-screen transition-colors duration-300 dark:bg-gray-900 bg-gray-100 dark:text-white text-gray-900">
       <Sidebar
         categories={categories}
+        paintings={paintings}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        selectedPainting={selectedPainting}
+        setSelectedPainting={setSelectedPainting}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         addCategory={addCategory}
         updateCategory={updateCategory}
+        updatePainting={updatePainting}
         deleteCategory={deleteCategory}
         getTaskCount={getTaskCount}
-        setCodeMode={setCodeMode}
+        setPaintMode={setPaintMode}
+        addPainting={addPainting}
       />
-      {codeMode ? (
-        <CodeArea />
+      {paintMode ? (
+        <PaintArea selectedPainting={selectedPainting} setSelectedPainting={setSelectedPainting} updatePainting={updatePainting} />
       ) : (
         <TaskArea
           currentCategory={getCurrentCategory()}

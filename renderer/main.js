@@ -101,6 +101,20 @@ function setupIpcHandlers() {
   ipcMain.handle("update-tasks-order", async (_, tasks) => {
     return await db.updateMultipleTasksOrder(tasks);
   });
+
+  ipcMain.handle("add-painting", async (_, name) => {
+    const newPainting = { name, color: "#ffffff" };
+    return await db.addPainting(newPainting);
+  });
+
+  ipcMain.handle("get-paintings", async () => {
+    return await db.getPaintings();
+  });
+
+  ipcMain.handle("update-painting", async (_, { id, name, strokes }) => {
+    await db.updatePainting(id, { name, strokes });
+    return await db.getPaintings();
+  });
 }
 
 function createWindow() {

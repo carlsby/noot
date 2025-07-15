@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NotebookPen } from "lucide-react";
 import TaskItem from "./TaskItem";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
 
 export default function TaskList({
   tasks,

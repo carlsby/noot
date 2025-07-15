@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { Edit, Trash, Save, X } from "lucide-react";
-import { ConfirmModal } from "./ConfirmModal";
+import {
+  Edit,
+  Trash,
+  Save,
+  X,
+  Notebook,
+  PenTool,
+  NotepadText,
+} from "lucide-react";
+import { ConfirmModal } from "../../shared/ConfirmModal";
 
 export default function CategoryItem({
   category,
@@ -9,7 +17,6 @@ export default function CategoryItem({
   updateCategory,
   deleteCategory,
   getTaskCount,
-  setCodeMode,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(category.name);
@@ -80,7 +87,7 @@ export default function CategoryItem({
   if (isEditing) {
     return (
       <div className="mx-2 mb-1">
-        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
           <div
             className="w-2 h-2 rounded-full flex-shrink-0"
             style={{ backgroundColor: category.color }}
@@ -95,7 +102,7 @@ export default function CategoryItem({
               if (e.key === "Escape") handleCancel();
             }}
             autoFocus
-            placeholder="Category name"
+            placeholder="Anteckningsnamn"
           />
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
@@ -118,9 +125,9 @@ export default function CategoryItem({
 
   return (
     <>
-      <div className="mx-2 mb-1">
+      <div>
         <div
-          className={`group relative transition-all duration-300 ease-out rounded-2xl ${
+          className={`group relative transition-all duration-300 ease-out ${
             isSelected
               ? "bg-white/60 dark:bg-gray-800/60 shadow-sm"
               : "hover:bg-gray-50/50 dark:hover:bg-gray-800/30"
@@ -131,14 +138,13 @@ export default function CategoryItem({
             className="w-full flex items-center gap-3 px-4 py-3 text-left relative"
             onClick={() => {
               setSelectedCategory(category._id);
-              setCodeMode(false);
             }}
           >
-            <div
-              className={`w-2 h-2 rounded-full flex-shrink-0 transition-all duration-200 ${
-                isSelected ? "scale-125 shadow-sm" : ""
+            <NotepadText
+              className={`w-4 h-4 transition-all duration-200 ${
+                isSelected ? "scale-110 shadow-sm" : ""
               }`}
-              style={{ backgroundColor: category.color }}
+              style={{ color: category.color }}
             />
 
             <span
@@ -151,8 +157,6 @@ export default function CategoryItem({
             >
               {category.name}
             </span>
-
-            {console.log(category.color)}
 
             <span
               className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-200 ${
@@ -168,7 +172,7 @@ export default function CategoryItem({
           {contextMenu.show && (
             <div
               ref={contextMenuRef}
-              className="absolute z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
+              className="absolute z-[70] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
               style={{
                 left: `${contextMenu.x}px`,
                 top: `${contextMenu.y + 8}px`,

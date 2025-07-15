@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import CategoryList from "./CategoryList";
-import AddCategoryForm from "./AddCategoryForm";
+import CategoryList from "./category/CategoryList";
+import AddCategoryForm from "./category/AddCategoryForm";
 import DarkModeToggle from "./DarkModeToggle";
-import NootLogo from "../assets/noot.png";
+import NootLogo from "../../assets/noot.png";
+import TabNavigation from "./TabNavigation";
+import PaintList from "./paint/PaintList";
+import AddPaintForm from "./paint/AddPaintForm";
 
 export default function Sidebar({
   darkMode,
@@ -15,9 +18,15 @@ export default function Sidebar({
   updateCategory,
   deleteCategory,
   getTaskCount,
-  setCodeMode,
+  setPaintMode,
+  addPainting,
+  paintings,
+  selectedPainting,
+  setSelectedPainting,
+  updatePainting,
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("note");
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -142,27 +151,45 @@ export default function Sidebar({
             </div>
           </div>
 
-          <div className="pt-6 px-6">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
-              Kategorier
-            </h2>
-          </div>
-
-          <CategoryList
-            categories={categories}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={(categoryId) => {
-              setSelectedCategory(categoryId);
-              closeMobileMenu();
-            }}
-            updateCategory={updateCategory}
-            deleteCategory={deleteCategory}
-            getTaskCount={getTaskCount}
-            setCodeMode={setCodeMode}
+          <TabNavigation
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            setPaintMode={setPaintMode}
+            setSelectedPainting={setSelectedPainting}
+            paintings={paintings}
           />
 
+          <div className="h-full">
+            {activeTab === "note" ? (
+              <CategoryList
+                categories={categories}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={(categoryId) => {
+                  setSelectedCategory(categoryId);
+                  closeMobileMenu();
+                }}
+                updateCategory={updateCategory}
+                deleteCategory={deleteCategory}
+                getTaskCount={getTaskCount}
+              />
+            ) : (
+              <PaintList
+                paintings={paintings}
+                setSelectedPainting={(painting) => {
+                  setSelectedPainting(painting);
+                  closeMobileMenu();
+                }}
+                updatePainting={updatePainting}
+              />
+            )}
+          </div>
+
           <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-700 h-[100px]">
-            <AddCategoryForm addCategory={addCategory} />
+            {activeTab === "note" ? (
+              <AddCategoryForm addCategory={addCategory} />
+            ) : (
+              <AddPaintForm addPainting={addPainting} />
+            )}
           </div>
         </div>
       </div>

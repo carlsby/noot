@@ -26,11 +26,19 @@ const selectedCategoryDB = new Datastore({
   filename: path.join(userDataDir, "selectedCategory.db"),
   autoload: true,
 });
+const paintingsDB = new Datastore({
+  filename: path.join(userDataDir, "paintings.db"),
+  autoload: true,
+});
+const selectedPaintingDB = new Datastore({
+  filename: path.join(userDataDir, "selectedPainting.db"),
+  autoload: true,
+});
 
 const timestamp = new Date().toISOString();
 
-// Funktioner för kategorier
 
+// Funktioner för kategorier
 function getCategories() {
   return new Promise((resolve, reject) => {
     categoriesDB.find({}, (err, docs) => {
@@ -99,6 +107,7 @@ function deleteCategory(id) {
   });
 }
 
+
 function setSelectedCategory(categoryId) {
   return new Promise((resolve, reject) => {
     selectedCategoryDB.update(
@@ -113,6 +122,7 @@ function setSelectedCategory(categoryId) {
   });
 }
 
+
 function getSelectedCategory() {
   return new Promise((resolve, reject) => {
     selectedCategoryDB.findOne({ _id: "selectedCategory" }, (err, doc) => {
@@ -121,6 +131,7 @@ function getSelectedCategory() {
     });
   });
 }
+
 
 function clearSelectedCategory() {
   return new Promise((resolve, reject) => {
@@ -131,8 +142,8 @@ function clearSelectedCategory() {
   });
 }
 
-// Funktioner för tasks
 
+// Funktioner för tasks
 function getTasks() {
   return new Promise((resolve, reject) => {
     tasksDB.find({}, (err, docs) => {
@@ -151,7 +162,6 @@ function addTask(task) {
       .exec((err, docs) => {
         if (err) return reject(err);
 
-        // Defensive: treat null order as -1 so it doesn't break maxOrder calculation
         const maxOrder =
           docs.length > 0 && typeof docs[0].order === "number" && docs[0].order >= 0
             ? docs[0].order
@@ -199,7 +209,6 @@ function updateMultipleTasksOrder(tasks) {
 }
 
 
-
 function updateTask(id, update) {
   return new Promise((resolve, reject) => {
     const updateWithTimestamp = {
@@ -237,8 +246,8 @@ function deleteTask(id) {
   });
 }
 
-// Darkmode toggle
 
+// Darkmode toggle
 function setColorMode(mode) {
   return new Promise((resolve, reject) => {
     colorModeDB.update(
@@ -253,6 +262,7 @@ function setColorMode(mode) {
   });
 }
 
+
 function getColorMode() {
   return new Promise((resolve, reject) => {
     colorModeDB.findOne({ _id: "colorMode" }, (err, doc) => {
@@ -261,6 +271,85 @@ function getColorMode() {
     });
   });
 }
+
+
+function addPainting(painting) {
+  return new Promise((resolve, reject) => {
+    const timestamp = new Date().toISOString();
+    const paintingsWithTimeStamps = {
+      ...painting,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      strokes: ""
+    };
+    paintingsDB.insert(paintingsWithTimeStamps, (err, newDoc) => {
+      if (err) reject(err);
+      else resolve(newDoc);
+    });
+  });
+}
+
+function updatePainting(id, update) {
+  const updateWithTimestamp = {
+    ...update,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return new Promise((resolve, reject) => {
+    paintingsDB.update(
+      { _id: id },
+      { $set: updateWithTimestamp },
+      {},
+      (err, numUpdated) => {
+        if (err) reject(err);
+        else resolve(numUpdated);
+      }
+    );
+  });
+}
+
+
+function getPaintings() {
+  return new Promise((resolve, reject) => {
+    paintingsDB.find({}, (err, docs) => {
+      if (err) reject(err);
+      else resolve(docs);
+    });
+  });
+}
+
+function setSelectedPainting(paintingId) {
+  return new Promise((resolve, reject) => {
+    selectedPaintingDB.update(
+      { _id: "selectedPainting" },
+      { _id: "selectedPainting", paintingId },
+      { upsert: true },
+      (err, numUpdated) => {
+        if (err) reject(err);
+        else resolve(numUpdated);
+      }
+    );
+  });
+}
+
+function getSelectedPainting() {
+  return new Promise((resolve, reject) => {
+    selectedPaintingDB.findOne({ _id: "selectedPainting" }, (err, doc) => {
+      if (err) reject(err);
+      else resolve(doc?.paintingId || null);
+    });
+  });
+}
+
+function clearSelectedPainting() {
+  return new Promise((resolve, reject) => {
+    selectedPaintingDB.remove({ _id: "selectedPainting" }, {}, (err, numRemoved) => {
+      if (err) reject(err);
+      else resolve(numRemoved);
+    });
+  });
+}
+
 
 module.exports = {
   getCategories,
@@ -276,5 +365,8 @@ module.exports = {
   getSelectedCategory,
   setSelectedCategory,
   clearSelectedCategory,
-  updateMultipleTasksOrder
+  updateMultipleTasksOrder,
+  addPainting,
+  getPaintings,
+  updatePainting,
 };

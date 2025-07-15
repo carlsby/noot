@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Plus, FolderPlus } from "lucide-react"
+import { Plus, NotepadText } from "lucide-react"
 
 export default function AddCategoryForm({ addCategory }) {
   const [newCategoryName, setNewCategoryName] = useState("")
@@ -20,12 +20,12 @@ export default function AddCategoryForm({ addCategory }) {
       }`}
     >
       <div className="flex-shrink-0">
-        <FolderPlus size={16} className="text-slate-400" />
+        <NotepadText size={16} className="text-slate-400" />
       </div>
       <input
         type="text"
         className="flex-1 bg-transparent border-none outline-none text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 text-sm"
-        placeholder="Ny kategori"
+        placeholder="Ny anteckning"
         value={newCategoryName}
         onChange={(e) => setNewCategoryName(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
@@ -33,8 +33,9 @@ export default function AddCategoryForm({ addCategory }) {
         onBlur={() => setIsFocused(false)}
       />
       <button
-        className="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-sm"
+        className={`p-2  text-white rounded-lg transition-colors shadow-sm ${newCategoryName.trim() === "" ? "bg-gray-700" : "bg-purple-600 hover:bg-purple-700"}`}
         onClick={handleAddCategory}
+        disabled={newCategoryName.trim() === ""}
       >
         <Plus size={14} />
       </button>

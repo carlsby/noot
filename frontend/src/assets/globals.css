@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-family: "Lexend", sans-serif;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 245, 245, 247;
@@ -43,7 +47,8 @@ body {
 }
 
 * {
-  transition-property: background-color, border-color, color, fill, stroke, opacity;
+  transition-property: background-color, border-color, color, fill, stroke,
+    opacity;
   transition-duration: 300ms;
   transition-timing-function: ease;
 }
