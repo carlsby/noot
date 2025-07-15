@@ -4,6 +4,10 @@
 
 * {
   font-family: "Lexend", sans-serif;
+  transition-property: background-color, border-color, color, fill, stroke,
+    opacity;
+  transition-duration: 300ms;
+  transition-timing-function: ease;
 }
 
 :root {
@@ -46,9 +50,39 @@ body {
   color-scheme: dark;
 }
 
-* {
-  transition-property: background-color, border-color, color, fill, stroke,
-    opacity;
-  transition-duration: 300ms;
-  transition-timing-function: ease;
+/* Webkit (Chrome, Safari, Edge) */
+.purple-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px; /* full rounded */
+  background: linear-gradient(to right, #7c3aed, #a78bfa); /* lila gradient */
+}
+
+.purple-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #7c3aed; /* lila */
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -6px; /* centrera på track */
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(124, 58, 237, 0.7);
+}
+
+/* Firefox */
+.purple-range::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #7c3aed, #a78bfa);
+}
+
+.purple-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background-color: #7c3aed;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(124, 58, 237, 0.7);
 }

@@ -11,9 +11,11 @@ export default function PaintArea({
   const canvasRef = useRef(null);
   const undoRef = useRef(null);
   const redoRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
   const saveDrawingRef = useRef(null);
   const colorInputRef = useRef(null);
   const autosaveTimeoutRef = useRef(null);
+  const [strokeWidth, setStrokeWidth] = useState(8);
   const [isErasing, setIsErasing] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -39,22 +41,25 @@ export default function PaintArea({
           setRedoStack([]);
         }
       } else {
-        // Om ingen strokes finns, nollställ stackar
+        // Om inga strokes finns, nollställ undostacken och redostacken :D
         setUndoStack([]);
         setRedoStack([]);
       }
     };
-
-    // Ladda strokes bara när selectedPainting._id ändras, dvs ny målning
     loadStrokes();
   }, [selectedPainting?._id]);
 
   const showTemporaryToast = (message) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
     setToastMessage(message);
     setShowToast(true);
-    setTimeout(() => {
+
+    toastTimeoutRef.current = setTimeout(() => {
       setShowToast(false);
-      setTimeout(() => setToastMessage(""), 300);
+      setToastMessage("");
+      toastTimeoutRef.current = null;
     }, 3000);
   };
 
@@ -226,7 +231,7 @@ export default function PaintArea({
                 <div className="bg-slate-50 dark:bg-slate-900 h-full relative">
                   <ReactSketchCanvas
                     ref={canvasRef}
-                    strokeWidth={4}
+                    strokeWidth={strokeWidth}
                     strokeColor={selectedPainting.color}
                     style={{
                       border: "none",
@@ -266,6 +271,26 @@ export default function PaintArea({
                     Färg
                   </span>
                 </div>
+              </div>
+              <div className="flex flex-col items-center">
+                <label
+                  htmlFor="strokeWidth"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+                >
+                  Penselstorlek
+                </label>
+                <input
+                  id="strokeWidth"
+                  type="range"
+                  min="1"
+                  max="30"
+                  value={strokeWidth}
+                  onChange={(e) => setStrokeWidth(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-300 rounded cursor-pointer appearance-none purple-range"
+                />
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  {strokeWidth}px
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -325,7 +350,7 @@ export default function PaintArea({
                     );
                   }}
                   className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium flex items-center gap-2"
-                  title="Spara målning"
+                  title="Spara målning (Ctrl + S)"
                 >
                   <Save />
                 </button>
