@@ -74,7 +74,6 @@ export default function PaintArea({
     if (!canvasRef.current) return;
     canvasRef.current.clearCanvas();
     showTemporaryToast("Målningen rensad!");
-    console.log("bajs");
   };
 
   const handleColorChange = (newColor) => {
@@ -243,6 +242,7 @@ export default function PaintArea({
                     canvasColor="transparent"
                     onStroke={handleStroke}
                     className="cursor-crosshair"
+                    eraserWidth={strokeWidth}
                   />
                 </div>
               </div>
