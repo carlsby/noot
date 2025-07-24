@@ -11,10 +11,12 @@ export default function App() {
   const [selectedPainting, setSelectedPainting] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [paintMode, setPaintMode] = useState(false);
+  const [fontCss, setFontCss] = useState("Lexend, sans-serif");
 
   useEffect(() => {
     fetchData();
     loadSelectedCategory();
+    loadFont();
   }, []);
 
   async function fetchData() {
@@ -26,6 +28,24 @@ export default function App() {
     setCategories(cats);
     setTasks(tks);
   }
+
+  async function loadFont() {
+    const font = await window.electronAPI.invoke("get-default-font");
+    if (font?.css) {
+      setFontCss(font.css);
+    }
+  }
+
+  async function getAllFonts() {
+    return await window.electronAPI.invoke("get-all-fonts");
+  }
+
+  const setDefaultFont = async (fontId) => {
+    const font = await window.electronAPI.invoke("set-default-font", fontId);
+    if (font?.css) {
+      setFontCss(font.css);
+    }
+  };
 
   async function loadSelectedCategory() {
     const savedCategoryId = await window.electronAPI.invoke(
@@ -209,7 +229,10 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen transition-colors duration-300 dark:bg-gray-900 bg-gray-100 dark:text-white text-gray-900">
+    <div
+      className="flex h-screen transition-colors duration-300 dark:bg-gray-900 bg-gray-100 dark:text-white text-gray-900"
+      style={{ fontFamily: fontCss }}
+    >
       <Sidebar
         categories={categories}
         paintings={paintings}
@@ -227,6 +250,9 @@ export default function App() {
         getTaskCount={getTaskCount}
         setPaintMode={setPaintMode}
         addPainting={addPainting}
+        getAllFonts={getAllFonts}
+        setDefaultFont={setDefaultFont}
+        fontCss={fontCss}
       />
       {paintMode ? (
         <PaintArea

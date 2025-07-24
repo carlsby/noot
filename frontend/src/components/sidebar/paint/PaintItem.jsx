@@ -75,8 +75,6 @@ export default function PaintItem({
 
   const isSelected = selectedPainting._id === painting._id;
 
-  console.log(selectedPainting)
-
   if (isEditing) {
     return (
       <div>
@@ -134,10 +132,9 @@ export default function PaintItem({
             }}
           >
             <Paintbrush
-              className={`w-4 h-4 transition-all duration-200 ${
+              className={`w-4 h-4 transition-all duration-200 text-black dark:text-white ${
                 isSelected ? "scale-110 shadow-sm" : ""
               }`}
-              style={{ color: painting.color }}
             />
 
             <span

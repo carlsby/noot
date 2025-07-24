@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Settings, X } from "lucide-react";
 import CategoryList from "./category/CategoryList";
 import AddCategoryForm from "./category/AddCategoryForm";
-import DarkModeToggle from "./DarkModeToggle";
+import DarkModeToggle from "./settings/DarkModeToggle";
 import NootLogo from "../../assets/noot.png";
 import TabNavigation from "./TabNavigation";
 import PaintList from "./paint/PaintList";
 import AddPaintForm from "./paint/AddPaintForm";
+import SettingsMenu from "./settings/SettingsMenu";
 
 export default function Sidebar({
   darkMode,
@@ -24,9 +25,13 @@ export default function Sidebar({
   selectedPainting,
   setSelectedPainting,
   updatePainting,
-  deletePainting
+  deletePainting,
+  getAllFonts,
+  setDefaultFont,
+  fontCss,
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState(false);
   const [activeTab, setActiveTab] = useState("note");
 
   const toggleMobileMenu = () => {
@@ -95,6 +100,26 @@ export default function Sidebar({
         `}
       >
         <div className="lg:hidden flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+                  {settings ? (
+        <div className="flex items-center gap-3 w-full">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+            <Settings className="text-gray-500" />
+          </div>
+          <div className="flex-1">
+            <h1 className="font-bold text-slate-900 dark:text-slate-100">
+              Inställningar
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Anpassa Noot
+            </p>
+          </div>
+          <X
+            className="text-gray-500 hover:text-black dark:hover:text-gray-400 cursor-pointer"
+            onClick={() => setSettings(false)}
+          />
+        </div>
+        ) : (
+          <>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center">
               <img
@@ -113,88 +138,104 @@ export default function Sidebar({
             </div>
           </div>
           <div className="flex gap-2">
-            <DarkModeToggle
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-            />
+            <button
+              onClick={() => setSettings(true)}
+              className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+            >
+              <Settings size={24} />
+            </button>
+
             <button
               onClick={closeMobileMenu}
-              className="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
               aria-label="Close menu"
             >
-              <X size={18} />
+              <X size={24} />
             </button>
           </div>
+          </>
+        )}
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex items-center gap-3 w-full">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-                <img
-                  src={NootLogo || "/placeholder.svg"}
-                  className="w-25 h-25"
-                  alt="Noot Logo"
-                />
-              </div>
-              <div className="flex-1">
-                <h1 className="font-bold text-slate-900 dark:text-slate-100">
-                  Noot
-                </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Från skaparen av Bebtlix
-                </p>
-              </div>
-              <DarkModeToggle
-                darkMode={darkMode}
-                toggleDarkMode={toggleDarkMode}
-              />
-            </div>
-          </div>
-
-          <TabNavigation
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            setPaintMode={setPaintMode}
-            setSelectedPainting={setSelectedPainting}
-            paintings={paintings}
+        {settings ? (
+          <SettingsMenu
+            setSettings={setSettings}
+            getAllFonts={getAllFonts}
+            setDefaultFont={setDefaultFont}
+            fontCss={fontCss}
           />
+        ) : (
+          <>
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-3 w-full">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <img
+                      src={NootLogo || "/placeholder.svg"}
+                      className="w-25 h-25"
+                      alt="Noot Logo"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h1 className="font-bold text-slate-900 dark:text-slate-100">
+                      Noot
+                    </h1>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Från skaparen av Bebtlix
+                    </p>
+                  </div>
+                  <Settings
+                    className="text-black dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"
+                    onClick={() => setSettings(true)}
+                  />
+                </div>
+              </div>
 
-          <div className="h-full">
-            {activeTab === "note" ? (
-              <CategoryList
-                categories={categories}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={(categoryId) => {
-                  setSelectedCategory(categoryId);
-                  closeMobileMenu();
-                }}
-                updateCategory={updateCategory}
-                deleteCategory={deleteCategory}
-                getTaskCount={getTaskCount}
-              />
-            ) : (
-              <PaintList
+              <TabNavigation
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                setPaintMode={setPaintMode}
+                setSelectedPainting={setSelectedPainting}
                 paintings={paintings}
-                setSelectedPainting={(painting) => {
-                  setSelectedPainting(painting);
-                  closeMobileMenu();
-                }}
-                selectedPainting={selectedPainting}
-                updatePainting={updatePainting}
-                deletePainting={deletePainting}
               />
-            )}
-          </div>
 
-          <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-700 h-[100px]">
-            {activeTab === "note" ? (
-              <AddCategoryForm addCategory={addCategory} />
-            ) : (
-              <AddPaintForm addPainting={addPainting} />
-            )}
-          </div>
-        </div>
+              <div className="h-full">
+                {activeTab === "note" ? (
+                  <CategoryList
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={(categoryId) => {
+                      setSelectedCategory(categoryId);
+                      closeMobileMenu();
+                    }}
+                    updateCategory={updateCategory}
+                    deleteCategory={deleteCategory}
+                    getTaskCount={getTaskCount}
+                  />
+                ) : (
+                  <PaintList
+                    paintings={paintings}
+                    setSelectedPainting={(painting) => {
+                      setSelectedPainting(painting);
+                      closeMobileMenu();
+                    }}
+                    selectedPainting={selectedPainting}
+                    updatePainting={updatePainting}
+                    deletePainting={deletePainting}
+                  />
+                )}
+              </div>
+
+              <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-700 h-[100px]">
+                {activeTab === "note" ? (
+                  <AddCategoryForm addCategory={addCategory} />
+                ) : (
+                  <AddPaintForm addPainting={addPainting} />
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

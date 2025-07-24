@@ -34,9 +34,60 @@ const selectedPaintingDB = new Datastore({
   filename: path.join(userDataDir, "selectedPainting.db"),
   autoload: true,
 });
+const fontDB = new Datastore({
+  filename: path.join(userDataDir, "fonts.db"),
+  autoload: true,
+});
+
+const fonts = [
+  {
+    _id: "font1",
+    name: "Lexend",
+    css: "'Lexend', sans-serif",
+    isDefault: true,
+  },
+  { _id: "font2", name: "Arial", css: "Arial, sans-serif", isDefault: false },
+  {
+    _id: "font3",
+    name: "Times New Roman",
+    css: "'Times New Roman', serif",
+    isDefault: false,
+  },
+  {
+    _id: "font4",
+    name: "Courier New",
+    css: "'Courier New', monospace",
+    isDefault: false,
+  },
+  { _id: "font5", name: "Georgia", css: "Georgia, serif", isDefault: false },
+  {
+    _id: "font6",
+    name: "Verdana",
+    css: "Verdana, sans-serif",
+    isDefault: false,
+  },
+  {
+    _id: "font7",
+    name: "Trebuchet MS",
+    css: "'Trebuchet MS', sans-serif",
+    isDefault: false,
+  },
+  {
+    _id: "font8",
+    name: "Lucida Console",
+    css: "'Lucida Console', monospace",
+    isDefault: false,
+  },
+  { _id: "font9", name: "Impact", css: "Impact, sans-serif", isDefault: false },
+  {
+    _id: "font10",
+    name: "Comic Sans MS",
+    css: "'Comic Sans MS', cursive, sans-serif",
+    isDefault: false,
+  },
+];
 
 const timestamp = new Date().toISOString();
-
 
 // Funktioner för kategorier
 function getCategories() {
@@ -63,7 +114,6 @@ function addCategory(cat) {
   });
 }
 
-
 function updateCategory(id, update) {
   return new Promise((resolve, reject) => {
     const updateWithTimestamp = {
@@ -82,7 +132,6 @@ function updateCategory(id, update) {
     );
   });
 }
-
 
 function deleteCategory(id) {
   logger.info(`Deleting category with id: ${id}`);
@@ -107,7 +156,6 @@ function deleteCategory(id) {
   });
 }
 
-
 function setSelectedCategory(categoryId) {
   return new Promise((resolve, reject) => {
     selectedCategoryDB.update(
@@ -122,7 +170,6 @@ function setSelectedCategory(categoryId) {
   });
 }
 
-
 function getSelectedCategory() {
   return new Promise((resolve, reject) => {
     selectedCategoryDB.findOne({ _id: "selectedCategory" }, (err, doc) => {
@@ -132,16 +179,18 @@ function getSelectedCategory() {
   });
 }
 
-
 function clearSelectedCategory() {
   return new Promise((resolve, reject) => {
-    selectedCategoryDB.remove({ _id: "selectedCategory" }, {}, (err, numRemoved) => {
-      if (err) reject(err);
-      else resolve(numRemoved);
-    });
+    selectedCategoryDB.remove(
+      { _id: "selectedCategory" },
+      {},
+      (err, numRemoved) => {
+        if (err) reject(err);
+        else resolve(numRemoved);
+      }
+    );
   });
 }
-
 
 // Funktioner för tasks
 function getTasks() {
@@ -163,7 +212,9 @@ function addTask(task) {
         if (err) return reject(err);
 
         const maxOrder =
-          docs.length > 0 && typeof docs[0].order === "number" && docs[0].order >= 0
+          docs.length > 0 &&
+          typeof docs[0].order === "number" &&
+          docs[0].order >= 0
             ? docs[0].order
             : -1;
 
@@ -196,7 +247,6 @@ function addTask(task) {
   });
 }
 
-
 function updateMultipleTasksOrder(tasks) {
   if (!Array.isArray(tasks)) {
     console.error("Expected an array of tasks but got:", tasks);
@@ -208,7 +258,6 @@ function updateMultipleTasksOrder(tasks) {
   );
 }
 
-
 function updateTask(id, update) {
   return new Promise((resolve, reject) => {
     const updateWithTimestamp = {
@@ -216,26 +265,30 @@ function updateTask(id, update) {
       updatedAt: new Date().toISOString(),
     };
 
-    tasksDB.update({ _id: id }, { $set: updateWithTimestamp }, {}, (err, numUpdated) => {
-      if (err) return reject(err);
+    tasksDB.update(
+      { _id: id },
+      { $set: updateWithTimestamp },
+      {},
+      (err, numUpdated) => {
+        if (err) return reject(err);
 
-      if (update.categoryId) {
-        categoriesDB.update(
-          { _id: update.categoryId },
-          { $set: { updatedAt: new Date().toISOString() } },
-          {},
-          (catErr) => {
-            if (catErr) return reject(catErr);
-            resolve(numUpdated);
-          }
-        );
-      } else {
-        resolve(numUpdated);
+        if (update.categoryId) {
+          categoriesDB.update(
+            { _id: update.categoryId },
+            { $set: { updatedAt: new Date().toISOString() } },
+            {},
+            (catErr) => {
+              if (catErr) return reject(catErr);
+              resolve(numUpdated);
+            }
+          );
+        } else {
+          resolve(numUpdated);
+        }
       }
-    });
+    );
   });
 }
-
 
 function deleteTask(id) {
   return new Promise((resolve, reject) => {
@@ -245,7 +298,6 @@ function deleteTask(id) {
     });
   });
 }
-
 
 // Darkmode toggle
 function setColorMode(mode) {
@@ -262,7 +314,6 @@ function setColorMode(mode) {
   });
 }
 
-
 function getColorMode() {
   return new Promise((resolve, reject) => {
     colorModeDB.findOne({ _id: "colorMode" }, (err, doc) => {
@@ -272,7 +323,6 @@ function getColorMode() {
   });
 }
 
-
 function addPainting(painting) {
   return new Promise((resolve, reject) => {
     const timestamp = new Date().toISOString();
@@ -280,7 +330,7 @@ function addPainting(painting) {
       ...painting,
       createdAt: timestamp,
       updatedAt: timestamp,
-      strokes: ""
+      strokes: "",
     };
     paintingsDB.insert(paintingsWithTimeStamps, (err, newDoc) => {
       if (err) reject(err);
@@ -308,7 +358,6 @@ function updatePainting(id, update) {
   });
 }
 
-
 function getPaintings() {
   return new Promise((resolve, reject) => {
     paintingsDB.find({}, (err, docs) => {
@@ -317,7 +366,6 @@ function getPaintings() {
     });
   });
 }
-
 
 function deletePainting(id) {
   return new Promise((resolve, reject) => {
@@ -333,6 +381,64 @@ function deletePainting(id) {
   });
 }
 
+function getAllFonts() {
+  return new Promise((resolve, reject) => {
+    fontDB.find({}, (err, docs) => {
+      if (err) reject(err);
+      else resolve(docs);
+    });
+  });
+}
+
+function getDefaultFont() {
+  return new Promise((resolve, reject) => {
+    fontDB.findOne({ isDefault: true }, (err, doc) => {
+      if (err) reject(err);
+      else resolve(doc);
+    });
+  });
+}
+
+function setDefaultFontById(fontId) {
+  return new Promise((resolve, reject) => {
+    fontDB.update(
+      { isDefault: true },
+      { $set: { isDefault: false } },
+      { multi: true },
+      (err) => {
+        if (err) return reject(err);
+        fontDB.update(
+          { _id: fontId },
+          { $set: { isDefault: true } },
+          {},
+          (err2, numUpdated) => {
+            if (err2) reject(err2);
+            else resolve(numUpdated);
+          }
+        );
+      }
+    );
+  });
+}
+
+
+function initializeFonts() {
+  fontDB.count({}, (err, count) => {
+    if (err) {
+      console.error("Error initializing fonts:", err);
+      return;
+    }
+
+    if (count === 0) {
+      fontDB.insert(fonts, (insertErr) => {
+        if (insertErr) {
+          console.error("Error inserting default fonts:", insertErr);
+        } else {
+        }
+      });
+    }
+  });
+}
 
 module.exports = {
   getCategories,
@@ -352,5 +458,9 @@ module.exports = {
   addPainting,
   getPaintings,
   updatePainting,
-  deletePainting
+  deletePainting,
+  getDefaultFont,
+  getAllFonts,
+  setDefaultFontById,
+  initializeFonts,
 };

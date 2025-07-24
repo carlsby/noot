@@ -214,7 +214,7 @@ export default function PaintArea({
             <div className="px-8 py-4">
               <div className="flex items-center gap-4 ms-6 lg:ms-0">
                 <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                  <Paintbrush className="text-white" size={24} />
+                  <Paintbrush className="text-black dark:text-white" size={24} />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
@@ -256,7 +256,7 @@ export default function PaintArea({
                 title="Välj färg"
               >
                 <div
-                  className="w-8 h-8 rounded-full border-2 border-white shadow-sm transition-transform duration-200 hover:scale-110"
+                  className="w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm transition-transform duration-200 hover:scale-110"
                   style={{ backgroundColor: selectedPainting.color }}
                 />
                 <input

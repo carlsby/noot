@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 * {
-  font-family: "Lexend", sans-serif;
   transition-property: background-color, border-color, color, fill, stroke,
     opacity;
   transition-duration: 300ms;

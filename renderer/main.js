@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const db = require("./db.js");
 
+db.initializeFonts();
+
 function randomColor() {
   const colors = [
     "#FF9F40",
@@ -116,10 +118,30 @@ function setupIpcHandlers() {
     return await db.getPaintings();
   });
 
-    ipcMain.handle("delete-painting", async (_, id) => {
+  ipcMain.handle("delete-painting", async (_, id) => {
     await db.deletePainting(id);
     return true;
   });
+
+  ipcMain.handle("get-all-fonts", async () => {
+    return await db.getAllFonts();
+  });
+
+  ipcMain.handle("get-default-font", async () => {
+    return await db.getDefaultFont();
+  });
+
+ipcMain.handle("set-default-font", async (_, fontId) => {
+  try {
+    await db.setDefaultFontById(fontId);
+    const font = await db.getDefaultFont();
+    return font;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+});
+
 }
 
 function createWindow() {

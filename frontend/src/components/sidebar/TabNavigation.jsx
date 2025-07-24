@@ -30,7 +30,6 @@ export default function TabNavigation({
       const sorted = [...paintings].sort(
         (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
       );
-      console.log(sorted)
       setSelectedPainting(sorted[0]);
     }
   };
