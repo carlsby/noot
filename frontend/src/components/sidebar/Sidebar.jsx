@@ -37,6 +37,7 @@ export default function Sidebar({
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+    setSettings(false);
   };
 
   useEffect(() => {
