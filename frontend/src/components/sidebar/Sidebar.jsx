@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Menu, Settings, X } from "lucide-react";
 import CategoryList from "./category/CategoryList";
 import AddCategoryForm from "./category/AddCategoryForm";
-import DarkModeToggle from "./settings/DarkModeToggle";
 import NootLogo from "../../assets/noot.png";
 import TabNavigation from "./TabNavigation";
 import PaintList from "./paint/PaintList";
@@ -10,8 +9,6 @@ import AddPaintForm from "./paint/AddPaintForm";
 import SettingsMenu from "./settings/SettingsMenu";
 
 export default function Sidebar({
-  darkMode,
-  toggleDarkMode,
   categories,
   selectedCategory,
   setSelectedCategory,
@@ -100,61 +97,61 @@ export default function Sidebar({
         `}
       >
         <div className="lg:hidden flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
-                  {settings ? (
-        <div className="flex items-center gap-3 w-full">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-            <Settings className="text-gray-500" />
-          </div>
-          <div className="flex-1">
-            <h1 className="font-bold text-slate-900 dark:text-slate-100">
-              Inställningar
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Anpassa Noot
-            </p>
-          </div>
-          <X
-            className="text-gray-500 hover:text-black dark:hover:text-gray-400 cursor-pointer"
-            onClick={() => setSettings(false)}
-          />
-        </div>
-        ) : (
-          <>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-              <img
-                src={NootLogo || "/placeholder.svg"}
-                className="w-25 h-25"
-                alt="Noot Logo"
+          {settings ? (
+            <div className="flex items-center gap-3 w-full">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                <Settings className="text-gray-500" />
+              </div>
+              <div className="flex-1">
+                <h1 className="font-bold text-slate-900 dark:text-slate-100">
+                  Inställningar
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Anpassa Noot
+                </p>
+              </div>
+              <X
+                className="text-gray-500 hover:text-black dark:hover:text-gray-400 cursor-pointer"
+                onClick={() => setSettings(false)}
               />
             </div>
-            <div>
-              <h1 className="font-bold text-slate-900 dark:text-slate-100">
-                Noot
-              </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Från skaparen av Bebtlix
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSettings(true)}
-              className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
-            >
-              <Settings size={24} />
-            </button>
+          ) : (
+            <>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                  <img
+                    src={NootLogo || "/placeholder.svg"}
+                    className="w-25 h-25"
+                    alt="Noot Logo"
+                  />
+                </div>
+                <div>
+                  <h1 className="font-bold text-slate-900 dark:text-slate-100">
+                    Noot
+                  </h1>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Från skaparen av Bebtlix
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSettings(true)}
+                  className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                >
+                  <Settings size={24} />
+                </button>
 
-            <button
-              onClick={closeMobileMenu}
-              className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
-              aria-label="Close menu"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          </>
-        )}
+                <button
+                  onClick={closeMobileMenu}
+                  className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {settings ? (

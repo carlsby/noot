@@ -228,6 +228,25 @@ export default function App() {
     }
   };
 
+useEffect(() => {
+  async function fetchColorMode() {
+    try {
+      const mode = await window.electronAPI.invoke("get-color-mode")
+      const isDark = mode === "dark"
+      if (isDark) {
+        document.documentElement.classList.add("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+      }
+    } catch (err) {
+      console.error("Failed to get color mode:", err)
+      document.documentElement.classList.remove("dark")
+    }
+  }
+  fetchColorMode()
+}, [])
+
+
   return (
     <div
       className="flex h-screen transition-colors duration-300 dark:bg-gray-900 bg-gray-100 dark:text-white text-gray-900"
