@@ -35,8 +35,8 @@ export default function TabNavigation({
   };
 
   return (
-    <div className="border-b border-slate-200 dark:border-slate-700">
-      <div className="flex bg-slate-100 dark:bg-slate-800 gap-1">
+    <div className="border-b border-neutral-200 dark:border-neutral-700">
+      <div className="flex bg-neutral-100 dark:bg-neutral-800 gap-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -51,8 +51,8 @@ export default function TabNavigation({
                 flex-1
                 ${
                   isActive
-                    ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                    ? "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 shadow-sm"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
                 }
               `}
             >
@@ -60,7 +60,7 @@ export default function TabNavigation({
               <span>{tab.label}</span>
 
               {isActive && (
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-neutral-500/10 to-neutral-500/10" />
               )}
             </button>
           );

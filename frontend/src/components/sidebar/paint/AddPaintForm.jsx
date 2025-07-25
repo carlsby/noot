@@ -1,30 +1,30 @@
-import { useState } from "react"
-import { Plus, NotepadText, Paintbrush } from "lucide-react"
+import { useState } from "react";
+import { Plus, NotepadText, Paintbrush } from "lucide-react";
 
 export default function AddPaintForm({ addPainting }) {
-  const [newPaintingName, setNewPaintingName] = useState("")
-  const [isFocused, setIsFocused] = useState(false)
+  const [newPaintingName, setNewPaintingName] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleAddPainting = () => {
-    if (newPaintingName.trim() === "") return
-    addPainting(newPaintingName)
-    setNewPaintingName("")
-  }
+    if (newPaintingName.trim() === "") return;
+    addPainting(newPaintingName);
+    setNewPaintingName("");
+  };
 
   return (
     <div
-      className={`flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border transition-all duration-200 ${
+      className={`flex items-center gap-3 p-3 h-[50px] bg-neutral-50 dark:bg-black rounded-xl border transition-all duration-200 ${
         isFocused
-          ? "border-purple-300 dark:border-purple-600 bg-white dark:bg-slate-700"
-          : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+          ? "border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700"
+          : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600"
       }`}
     >
       <div className="flex-shrink-0">
-        <Paintbrush size={16} className="text-slate-400" />
+        <Paintbrush size={16} className="text-neutral-400" />
       </div>
       <input
         type="text"
-        className="flex-1 bg-transparent border-none outline-none text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 text-sm"
+        className="flex-1 bg-transparent border-none outline-none text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 text-sm"
         placeholder="Ny målning"
         value={newPaintingName}
         onChange={(e) => setNewPaintingName(e.target.value)}
@@ -33,12 +33,12 @@ export default function AddPaintForm({ addPainting }) {
         onBlur={() => setIsFocused(false)}
       />
       <button
-        className={`p-2  text-white rounded-lg transition-colors shadow-sm ${newPaintingName.trim() === "" ? "bg-gray-700" : "bg-purple-600 hover:bg-purple-700"}`}
+        className={`p-2 text-black rounded-lg transition-colors shadow-sm ${newPaintingName.trim() === "" ? "bg-neutral-300 dark:bg-neutral-900" : "bg-neutral-300 hover:bg-neutral-300/80"}`}
         onClick={handleAddPainting}
         disabled={newPaintingName.trim() === ""}
       >
         <Plus size={14} />
       </button>
     </div>
-  )
+  );
 }

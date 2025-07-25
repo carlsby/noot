@@ -146,8 +146,8 @@ ipcMain.handle("set-default-font", async (_, fontId) => {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 700,
+    width: 1280,
+    height: 768,
     webPreferences: {
       preload: path.join(__dirname, "../preload.js"),
       contextIsolation: true,

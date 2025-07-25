@@ -1,7 +1,8 @@
 {
   "name": "noot",
+  "author": "Carlsby",
   "version": "1.0.0",
-  "description": "",
+  "description": "Noot",
   "main": "renderer/main.js",
   "type": "commonjs",
   "scripts": {
@@ -15,7 +16,7 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.yourname.noot",
+    "appId": "com.electron.noot",
     "productName": "Noot",
     "files": [
       "renderer/**/*",

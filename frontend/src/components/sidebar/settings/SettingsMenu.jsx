@@ -11,16 +11,16 @@ export default function SettingsMenu({
 }) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+      <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700">
         <div className="flex items-center gap-3 w-full">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center">
             <Settings className="text-gray-500" />
           </div>
           <div className="flex-1">
-            <h1 className="font-bold text-slate-900 dark:text-slate-100">
+            <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
               Inställningar
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
               Anpassa Noot
             </p>
           </div>

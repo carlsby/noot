@@ -46,46 +46,62 @@ const fonts = [
     css: "'Lexend', sans-serif",
     isDefault: true,
   },
-  { _id: "font2", name: "Arial", css: "Arial, sans-serif", isDefault: false },
+  {
+    _id: "font2",
+    name: "Inter",
+    css: "'Inter', sans-serif",
+    isDefault: false,
+  },
   {
     _id: "font3",
-    name: "Times New Roman",
-    css: "'Times New Roman', serif",
+    name: "Manrope",
+    css: "'Manrope', sans-serif",
     isDefault: false,
   },
   {
     _id: "font4",
-    name: "Courier New",
-    css: "'Courier New', monospace",
+    name: "Urbanist",
+    css: "'Urbanist', sans-serif",
     isDefault: false,
   },
-  { _id: "font5", name: "Georgia", css: "Georgia, serif", isDefault: false },
+  {
+    _id: "font5",
+    name: "Rubik",
+    css: "'Rubik', sans-serif",
+    isDefault: false,
+  },
   {
     _id: "font6",
-    name: "Verdana",
-    css: "Verdana, sans-serif",
+    name: "Space Grotesk",
+    css: "'Space Grotesk', sans-serif",
     isDefault: false,
   },
   {
     _id: "font7",
-    name: "Trebuchet MS",
-    css: "'Trebuchet MS', sans-serif",
+    name: "DM Sans",
+    css: "'DM Sans', sans-serif",
     isDefault: false,
   },
   {
     _id: "font8",
-    name: "Lucida Console",
-    css: "'Lucida Console', monospace",
+    name: "Outfit",
+    css: "'Outfit', sans-serif",
     isDefault: false,
   },
-  { _id: "font9", name: "Impact", css: "Impact, sans-serif", isDefault: false },
+  {
+    _id: "font9",
+    name: "Sora",
+    css: "'Sora', sans-serif",
+    isDefault: false,
+  },
   {
     _id: "font10",
-    name: "Comic Sans MS",
-    css: "'Comic Sans MS', cursive, sans-serif",
+    name: "Cabinet Grotesk",
+    css: "'Cabinet Grotesk', sans-serif",
     isDefault: false,
   },
 ];
+
 
 const timestamp = new Date().toISOString();
 

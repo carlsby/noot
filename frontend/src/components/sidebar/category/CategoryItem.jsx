@@ -87,7 +87,7 @@ export default function CategoryItem({
   if (isEditing) {
     return (
       <div>
-        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-neutral-950 h-[50px]">
           <div
             className="w-2 h-2 rounded-full flex-shrink-0"
             style={{ backgroundColor: category.color }}
@@ -106,7 +106,7 @@ export default function CategoryItem({
           />
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
-              className="w-8 h-8 flex items-center justify-center text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all duration-200"
+              className="w-8 h-8 flex items-center justify-center text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/20 rounded-xl transition-all duration-200"
               onClick={handleSave}
             >
               <Save size={14} />
@@ -127,15 +127,15 @@ export default function CategoryItem({
     <>
       <div>
         <div
-          className={`group relative transition-all duration-300 ease-out ${
+          className={`group relative ${
             isSelected
-              ? "bg-white/60 dark:bg-gray-800/60 shadow-sm"
-              : "hover:bg-gray-50/50 dark:hover:bg-gray-800/30"
+              ? "bg-white/60 dark:bg-neutral-900 shadow-sm"
+              : "hover:bg-gray-50/50 dark:hover:bg-neutral-800/20"
           }`}
           onContextMenu={handleContextMenu}
         >
           <button
-            className="w-full flex items-center gap-3 px-4 py-3 text-left relative"
+            className="w-full flex items-center gap-3 px-4 py-3 text-left relative h-[50px]"
             onClick={() => {
               setSelectedCategory(category._id);
             }}
@@ -159,10 +159,10 @@ export default function CategoryItem({
             </span>
 
             <span
-              className={`text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-200 ${
+              className={`text-xs font-medium h-5 w-5 flex justify-center items-center rounded-full transition-all duration-200 ${
                 isSelected
-                  ? `text-gray-600 dark:text-gray-400 bg-[${category.color}] dark:bg-gray-700/80`
-                  : "text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800"
+                  ? `text-gray-600 dark:text-gray-400 bg-neutral-300 dark:bg-neutral-700`
+                  : "text-gray-500 dark:text-gray-400 bg-neutral-200 dark:bg-neutral-800"
               }`}
             >
               {getTaskCount(category._id)}

@@ -91,23 +91,23 @@ export default function Sidebar({
               : "-translate-x-full lg:translate-x-0"
           }
           flex flex-col
-          bg-white dark:bg-slate-900 
-          border-r border-slate-200 dark:border-slate-700
+          bg-neutral-100 dark:bg-neutral-950
+          border-r border-neutral-200 dark:border-neutral-700
           shadow-xl lg:shadow-none
           overflow-hidden
         `}
       >
-        <div className="lg:hidden flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+        <div className="lg:hidden flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700">
           {settings ? (
             <div className="flex items-center gap-3 w-full">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center">
                 <Settings className="text-gray-500" />
               </div>
               <div className="flex-1">
-                <h1 className="font-bold text-slate-900 dark:text-slate-100">
+                <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
                   Inställningar
                 </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
                   Anpassa Noot
                 </p>
               </div>
@@ -127,10 +127,10 @@ export default function Sidebar({
                   />
                 </div>
                 <div>
-                  <h1 className="font-bold text-slate-900 dark:text-slate-100">
+                  <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
                     Noot
                   </h1>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
                     Från skaparen av Bebtlix
                   </p>
                 </div>
@@ -138,14 +138,14 @@ export default function Sidebar({
               <div className="flex gap-2">
                 <button
                   onClick={() => setSettings(true)}
-                  className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                  className=" text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
                 >
                   <Settings size={24} />
                 </button>
 
                 <button
                   onClick={closeMobileMenu}
-                  className=" text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                  className=" text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
                   aria-label="Close menu"
                 >
                   <X size={24} />
@@ -165,7 +165,7 @@ export default function Sidebar({
         ) : (
           <>
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+              <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700">
                 <div className="flex items-center gap-3 w-full">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center">
                     <img
@@ -175,10 +175,10 @@ export default function Sidebar({
                     />
                   </div>
                   <div className="flex-1">
-                    <h1 className="font-bold text-slate-900 dark:text-slate-100">
+                    <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
                       Noot
                     </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
                       Från skaparen av Bebtlix
                     </p>
                   </div>
@@ -224,7 +224,7 @@ export default function Sidebar({
                 )}
               </div>
 
-              <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-700 h-[100px]">
+              <div className="mt-auto flex items-center justify-center border-t px-8 border-neutral-200 dark:border-neutral-700 h-[125px]">
                 {activeTab === "note" ? (
                   <AddCategoryForm addCategory={addCategory} />
                 ) : (

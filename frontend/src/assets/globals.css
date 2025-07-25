@@ -52,8 +52,9 @@ body {
 /* Webkit (Chrome, Safari, Edge) */
 .purple-range::-webkit-slider-runnable-track {
   height: 8px;
-  border-radius: 9999px; /* full rounded */
-  background: linear-gradient(to right, #7c3aed, #a78bfa); /* lila gradient */
+  border-radius: 9999px; 
+  background: linear-gradient(to right, #ffff, #ffff); 
+  border: 1px solid rgb(202, 202, 202);
 }
 
 .purple-range::-webkit-slider-thumb {
@@ -61,12 +62,12 @@ body {
   appearance: none;
   width: 20px;
   height: 20px;
-  background-color: #7c3aed; /* lila */
+  background-color: black; 
   border-radius: 50%;
   cursor: pointer;
-  margin-top: -6px; /* centrera på track */
+  margin-top: -6px; 
   border: 2px solid white;
-  box-shadow: 0 0 4px rgba(124, 58, 237, 0.7);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
 }
 
 /* Firefox */

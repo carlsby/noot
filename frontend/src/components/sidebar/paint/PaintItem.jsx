@@ -78,11 +78,7 @@ export default function PaintItem({
   if (isEditing) {
     return (
       <div>
-        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-          <div
-            className="w-2 h-2 rounded-full flex-shrink-0"
-            style={{ backgroundColor: painting.color }}
-          />
+        <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-neutral-950 h-[50px]">
           <input
             type="text"
             className="min-w-0 flex-1 bg-transparent text-gray-900 dark:text-gray-100 text-sm font-medium border-none outline-none placeholder-gray-400"
@@ -97,7 +93,7 @@ export default function PaintItem({
           />
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
-              className="w-8 h-8 flex items-center justify-center text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all duration-200"
+              className="w-8 h-8 flex items-center justify-center text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/20 rounded-xl transition-all duration-200"
               onClick={handleSave}
             >
               <Save size={14} />
@@ -118,15 +114,15 @@ export default function PaintItem({
     <>
       <div>
         <div
-          className={`group relative transition-all duration-300 ease-out ${
+          className={`group relative ${
             isSelected
-              ? "bg-white/60 dark:bg-gray-800/60 shadow-sm"
-              : "hover:bg-gray-50/50 dark:hover:bg-gray-800/30"
+              ? "bg-white/60 dark:bg-neutral-900 shadow-sm"
+              : "hover:bg-gray-50/50 dark:hover:bg-neutral-800/20"
           }`}
           onContextMenu={handleContextMenu}
         >
           <button
-            className="w-full flex items-center gap-3 px-4 py-3 text-left relative"
+            className="w-full flex items-center gap-3 px-4 py-3 text-left relative h-[50px]"
             onClick={() => {
               setSelectedPainting(painting);
             }}
@@ -152,14 +148,14 @@ export default function PaintItem({
           {contextMenu.show && (
             <div
               ref={contextMenuRef}
-              className="absolute z-[70] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
+              className="absolute z-[70] bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
               style={{
                 left: `${contextMenu.x}px`,
                 top: `${contextMenu.y + 8}px`,
               }}
             >
               <button
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 rounded-md dark:hover:bg-gray-800/40 transition-colors duration-150"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 rounded-md dark:hover:bg-neutral-800/40 transition-colors duration-150"
                 onClick={handleEdit}
               >
                 <Edit size={16} />
