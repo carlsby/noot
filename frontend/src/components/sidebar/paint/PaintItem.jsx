@@ -155,7 +155,7 @@ export default function PaintItem({
               }}
             >
               <button
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 rounded-md dark:hover:bg-neutral-800/40 transition-colors duration-150"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 rounded-md dark:hover:bg-gray-800/40 transition-colors duration-150"
                 onClick={handleEdit}
               >
                 <Edit size={16} />

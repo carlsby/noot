@@ -172,7 +172,7 @@ export default function CategoryItem({
           {contextMenu.show && (
             <div
               ref={contextMenuRef}
-              className="absolute z-[70] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
+              className="absolute z-[70] bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
               style={{
                 left: `${contextMenu.x}px`,
                 top: `${contextMenu.y + 8}px`,

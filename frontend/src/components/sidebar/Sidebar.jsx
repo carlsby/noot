@@ -197,7 +197,7 @@ export default function Sidebar({
                 paintings={paintings}
               />
 
-              <div className="h-full">
+              <div className="flex-1 overflow-y-auto ">
                 {activeTab === "note" ? (
                   <CategoryList
                     categories={categories}
@@ -224,7 +224,7 @@ export default function Sidebar({
                 )}
               </div>
 
-              <div className="mt-auto flex items-center justify-center border-t px-8 border-neutral-200 dark:border-neutral-700 h-[125px]">
+              <div className="mt-auto flex items-center justify-center border-t px-8 border-neutral-200 dark:border-neutral-700 h-[95px]">
                 {activeTab === "note" ? (
                   <AddCategoryForm addCategory={addCategory} />
                 ) : (
