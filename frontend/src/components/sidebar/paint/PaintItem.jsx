@@ -93,13 +93,13 @@ export default function PaintItem({
           />
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
-              className="w-8 h-8 flex items-center justify-center text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/20 rounded-xl transition-all duration-200"
+              className="w-8 h-8 flex items-center justify-center text-neutral-900 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-500/20 dark:hover:text-white rounded-xl transition-all duration-200"
               onClick={handleSave}
             >
               <Save size={14} />
             </button>
             <button
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200"
+              className="w-8 h-8 flex items-center justify-center text-neutral-900 dark:text-neutral-200 hover:bg-red-100 dark:hover:bg-red-500/20 dark:hover:text-white rounded-xl transition-all duration-200"
               onClick={handleCancel}
             >
               <X size={14} />

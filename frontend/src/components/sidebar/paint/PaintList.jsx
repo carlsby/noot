@@ -10,8 +10,8 @@ export default function PaintList({
   paintings.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   return (
-    <div className="flex-1 overflow-y-auto mb-4 h-full">
-      <ul className="">
+    <div>
+      <ul>
         {paintings.map((painting) => (
           <li key={painting._id} className="group">
             <PaintItem

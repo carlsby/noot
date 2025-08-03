@@ -130,9 +130,6 @@ export default function Sidebar({
                   <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
                     Noot
                   </h1>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Från skaparen av Bebtlix
-                  </p>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -178,9 +175,6 @@ export default function Sidebar({
                     <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
                       Noot
                     </h1>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Från skaparen av Bebtlix
-                    </p>
                   </div>
                   <Settings
                     className="text-black dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"
