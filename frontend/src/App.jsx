@@ -229,22 +229,29 @@ export default function App() {
   };
 
 useEffect(() => {
-  async function fetchColorMode() {
+  async function fetchTheme() {
     try {
       const mode = await window.electronAPI.invoke("get-color-mode")
-      const isDark = mode === "dark"
-      if (isDark) {
-        document.documentElement.classList.add("dark")
+
+      const THEMES = ["light", "dark", "space", "robot"]
+
+      document.documentElement.classList.remove(...THEMES)
+
+      if (THEMES.includes(mode)) {
+        document.documentElement.classList.add(mode)
       } else {
-        document.documentElement.classList.remove("dark")
+        document.documentElement.classList.add("light")
       }
     } catch (err) {
       console.error("Failed to get color mode:", err)
-      document.documentElement.classList.remove("dark")
+      document.documentElement.classList.remove("dark", "space", "robot")
+      document.documentElement.classList.add("light")
     }
   }
-  fetchColorMode()
+
+  fetchTheme()
 }, [])
+
 
 
   return (

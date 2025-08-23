@@ -35,8 +35,8 @@ export default function TabNavigation({
   };
 
   return (
-    <div className="border-b border-neutral-200 dark:border-neutral-700">
-      <div className="flex bg-neutral-100 dark:bg-neutral-800 gap-1">
+    <div className="border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-400">
+      <div className="flex bg-neutral-100 dark:bg-neutral-800 gap-1 space:bg-indigo-400">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -51,8 +51,8 @@ export default function TabNavigation({
                 flex-1
                 ${
                   isActive
-                    ? "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 shadow-sm"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                    ? "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 shadow-sm space:bg-indigo-400 space:text-indigo-950"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 space:bg-gray-950 space:text-gray-600"
                 }
               `}
             >

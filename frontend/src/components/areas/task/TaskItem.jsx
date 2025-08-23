@@ -59,7 +59,7 @@ export default function TaskItem({
     return (
       <div
         ref={editContainerRef}
-        className="bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-1 shadow-sm"
+        className="bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 space:bg-green-600 space:border-green-700 p-1 shadow-sm"
       >
         <div className="flex items-center gap-3">
           <button
@@ -71,9 +71,9 @@ export default function TaskItem({
             title={task.completed ? "Gör ofärdig" : "Markera som färdig"}
           >
             {task.completed ? (
-              <CheckCircle size={20} className="text-emerald-500" />
+              <CheckCircle size={20} className="text-emerald-500 space:text-indigo-950/40" />
             ) : (
-              <Circle size={20} />
+              <Circle className="space:text-indigo-950" size={20} />
             )}
           </button>
 
@@ -92,14 +92,14 @@ export default function TaskItem({
 
           <div className="flex items-center gap-1">
             <button
-              className="p-2 text-neutral-400 hover:text-black dark:hover-text-white hover:bg-neutral-300 dark:hover:bg-neutral-900/20 rounded-lg transition-colors"
+              className="p-2 text-neutral-400 hover:text-black dark:hover-text-white hover:bg-neutral-300 dark:hover:bg-neutral-900/20 space:text-indigo-950 hover:space:bg-indigo-900 hover:space:text-white rounded-lg transition-colors"
               onClick={handleSave}
               title="Spara"
             >
               <Save size={16} />
             </button>
             <button
-              className="p-2 text-neutral-400 hover:text-black dark:hover-text-white hover:bg-neutral-300 dark:hover:bg-neutral-900/20 rounded-lg transition-colors"
+              className="p-2 text-neutral-400 hover:text-black dark:hover-text-white hover:bg-neutral-300 dark:hover:bg-neutral-900/20 space:text-indigo-950 hover:space:bg-gray-950 hover:space:text-white rounded-lg transition-colors"
               onClick={handleCancel}
               title="Avbryt"
             >
@@ -115,7 +115,7 @@ export default function TaskItem({
     <>
       <div
         {...dragHandleProps}
-        className={`group bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-1 hover:border-neutral-300 dark:hover:border-neutral-600 transition-all duration-200 cursor-grab active:cursor-grabbing ${
+        className={`group bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-1 hover:border-neutral-300 dark:hover:border-neutral-600 space:bg-green-500 space:border-green-600 transition-all duration-200 cursor-grab active:cursor-grabbing ${
           task.completed ? "opacity-60" : ""
         } ${
           isDragging
@@ -128,7 +128,7 @@ export default function TaskItem({
           title="Flytta genom dra och släpp"
         >
           <div className="flex-shrink-0 opacity-30 group-hover:opacity-60 transition-opacity">
-            <GripVertical size={16} className="text-neutral-400" />
+            <GripVertical size={16} className="text-neutral-400 space:text-indigo-950" />
           </div>
 
           <button
@@ -139,9 +139,9 @@ export default function TaskItem({
             }
           >
             {task.completed ? (
-              <CheckCircle size={20} className="text-emerald-500" />
+              <CheckCircle size={20} className="text-emerald-500 space:text-indigo-950/40" />
             ) : (
-              <Circle size={20} />
+              <Circle className="space:text-indigo-950" size={20} />
             )}
           </button>
 
@@ -150,8 +150,8 @@ export default function TaskItem({
             title="Dubbelklicka för att redigera"
             className={`flex-1 cursor-pointer text-sm transition-colors ${
               task.completed
-                ? "line-through text-neutral-500"
-                : "text-neutral-900 dark:text-neutral-100"
+                ? "line-through text-neutral-500 space:text-indigo-950/40"
+                : "text-neutral-900 dark:text-neutral-100 space:text-indigo-950"
             }`}
           >
             {task.text}
@@ -159,7 +159,7 @@ export default function TaskItem({
 
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
-              className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 space:bg-red-900 space:text-red-400 space:hover:bg-red-950 rounded-lg transition-colors"
               onClick={() => setShowConfirm(true)}
               title="Radera"
             >

@@ -1,91 +1,132 @@
-import { Eraser, Paintbrush, Redo, Save, Undo } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { ReactSketchCanvas } from "react-sketch-canvas"
-import { ConfirmClearModal } from "../../shared/ConfirmClearModal"
+import { Eraser, Paintbrush, Redo, Save, Trash, Undo } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ReactSketchCanvas } from "react-sketch-canvas";
+import { ConfirmClearModal } from "../../shared/ConfirmClearModal";
+import spaceImg from "../../../assets/space.jpg";
 
-export default function PaintArea({ setSelectedPainting, selectedPainting, updatePainting }) {
-  const canvasRef = useRef(null)
-  const undoRef = useRef(null)
-  const redoRef = useRef(null)
-  const toastTimeoutRef = useRef(null)
-  const saveDrawingRef = useRef(null)
-  const colorInputRef = useRef(null)
-  const autosaveTimeoutRef = useRef(null)
+export default function PaintArea({
+  setSelectedPainting,
+  selectedPainting,
+  updatePainting,
+}) {
+  const canvasRef = useRef(null);
+  const undoRef = useRef(null);
+  const redoRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
+  const saveDrawingRef = useRef(null);
+  const colorInputRef = useRef(null);
+  const autosaveTimeoutRef = useRef(null);
 
-  const [strokeWidth, setStrokeWidth] = useState(8)
-  const [isErasing, setIsErasing] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
-  const [showToast, setShowToast] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [undoStack, setUndoStack] = useState([])
-  const [redoStack, setRedoStack] = useState([])
+  const [strokeWidth, setStrokeWidth] = useState(8);
+  const [isErasing, setIsErasing] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [isSpace, setIsSpace] = useState(false);
+
+  useEffect(() => {
+    async function fetchTheme() {
+      try {
+        const mode = await window.electronAPI.invoke("get-color-mode");
+        const THEMES = ["light", "dark", "space", "robot"];
+
+        document.documentElement.classList.remove(...THEMES);
+        if (THEMES.includes(mode)) {
+          document.documentElement.classList.add(mode);
+        } else {
+          document.documentElement.classList.add("light");
+        }
+
+        setIsSpace(mode === "space");
+      } catch (err) {
+        console.error("Failed to get color mode:", err);
+        document.documentElement.classList.remove("dark", "space", "robot");
+        document.documentElement.classList.add("light");
+        setIsSpace(false);
+      }
+    }
+
+    fetchTheme();
+
+    const observer = new MutationObserver(() => {
+      setIsSpace(document.documentElement.classList.contains("space"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const loadStrokes = async () => {
-      if (!canvasRef.current) return
-      await canvasRef.current.clearCanvas()
+      if (!canvasRef.current) return;
+      await canvasRef.current.clearCanvas();
       if (selectedPainting?.strokes) {
         try {
-          const parsedStrokes = JSON.parse(selectedPainting.strokes)
-          await canvasRef.current.loadPaths(parsedStrokes)
-          setUndoStack([parsedStrokes])
-          setRedoStack([])
+          const parsedStrokes = JSON.parse(selectedPainting.strokes);
+          await canvasRef.current.loadPaths(parsedStrokes);
+          setUndoStack([parsedStrokes]);
+          setRedoStack([]);
         } catch (error) {
-          console.error("Kunde inte ladda strokes:", error)
-          setUndoStack([])
-          setRedoStack([])
+          console.error("Kunde inte ladda strokes:", error);
+          setUndoStack([]);
+          setRedoStack([]);
         }
       } else {
-        setUndoStack([])
-        setRedoStack([])
+        setUndoStack([]);
+        setRedoStack([]);
       }
-    }
+    };
 
-    loadStrokes()
-  }, [selectedPainting?._id])
+    loadStrokes();
+  }, [selectedPainting?._id]);
 
   const showTemporaryToast = (message) => {
     if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current)
+      clearTimeout(toastTimeoutRef.current);
     }
-    setToastMessage(message)
-    setShowToast(true)
+    setToastMessage(message);
+    setShowToast(true);
     toastTimeoutRef.current = setTimeout(() => {
-      setShowToast(false)
-      setToastMessage("")
-      toastTimeoutRef.current = null
-    }, 3000)
-  }
+      setShowToast(false);
+      setToastMessage("");
+      toastTimeoutRef.current = null;
+    }, 3000);
+  };
 
   const saveDrawing = async (paintingId = selectedPainting._id) => {
-    if (!canvasRef.current) return
-    const paths = await canvasRef.current.exportPaths()
-    const strokes = JSON.stringify(paths)
-    updatePainting(paintingId, selectedPainting.name, strokes)
-  }
+    if (!canvasRef.current) return;
+    const paths = await canvasRef.current.exportPaths();
+    const strokes = JSON.stringify(paths);
+    updatePainting(paintingId, selectedPainting.name, strokes);
+  };
 
   const clearCanvas = () => {
-    if (!canvasRef.current) return
-    canvasRef.current.clearCanvas()
-    showTemporaryToast("Målningen rensad!")
-  }
+    if (!canvasRef.current) return;
+    canvasRef.current.clearCanvas();
+    showTemporaryToast("Målningen rensad!");
+  };
 
   const handleColorChange = (newColor) => {
     setSelectedPainting((prev) => {
-      if (prev.color === newColor) return prev
+      if (prev.color === newColor) return prev;
       return {
         ...prev,
         color: newColor,
-      }
-    })
-  }
+      };
+    });
+  };
 
   const toggleEraser = () => {
-    if (!canvasRef.current) return
-    const newErasing = !isErasing
-    setIsErasing(newErasing)
-    canvasRef.current.eraseMode(newErasing)
+    if (!canvasRef.current) return;
+    const newErasing = !isErasing;
+    setIsErasing(newErasing);
+    canvasRef.current.eraseMode(newErasing);
     showTemporaryToast(
       newErasing ? (
         <div className="flex items-center gap-2">
@@ -95,104 +136,111 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
         <div className="flex items-center gap-2">
           <Paintbrush /> Pensel aktiverad!
         </div>
-      ),
-    )
-  }
+      )
+    );
+  };
 
   const handleStroke = async () => {
-    if (!canvasRef.current) return
-    const paths = await canvasRef.current.exportPaths()
-    setUndoStack((prev) => [...prev, paths])
-    setRedoStack([])
-    setHasUnsavedChanges(true)
+    if (!canvasRef.current) return;
+    const paths = await canvasRef.current.exportPaths();
+    setUndoStack((prev) => [...prev, paths]);
+    setRedoStack([]);
+    setHasUnsavedChanges(true);
 
     if (autosaveTimeoutRef.current) {
-      clearTimeout(autosaveTimeoutRef.current)
+      clearTimeout(autosaveTimeoutRef.current);
     }
 
-    const currentPaintingId = selectedPainting._id
+    const currentPaintingId = selectedPainting._id;
     autosaveTimeoutRef.current = setTimeout(() => {
       if (hasUnsavedChanges) {
-        saveDrawing(currentPaintingId)
-        setHasUnsavedChanges(false)
-        showTemporaryToast("Autosparad!")
+        saveDrawing(currentPaintingId);
+        setHasUnsavedChanges(false);
+        showTemporaryToast("Autosparad!");
       }
-    }, 5000)
-  }
+    }, 5000);
+  };
 
   const undo = async () => {
-    if (undoStack.length === 0 || !canvasRef.current) return
-    const newUndoStack = [...undoStack]
-    const lastPaths = newUndoStack.pop()
-    const currentPaths = await canvasRef.current.exportPaths()
-    setRedoStack((prev) => [...prev, currentPaths])
-    setUndoStack(newUndoStack)
+    if (undoStack.length === 0 || !canvasRef.current) return;
+    const newUndoStack = [...undoStack];
+    const lastPaths = newUndoStack.pop();
+    const currentPaths = await canvasRef.current.exportPaths();
+    setRedoStack((prev) => [...prev, currentPaths]);
+    setUndoStack(newUndoStack);
 
-    const previousPaths = newUndoStack.length > 0 ? newUndoStack[newUndoStack.length - 1] : []
-    await canvasRef.current.clearCanvas()
+    const previousPaths =
+      newUndoStack.length > 0 ? newUndoStack[newUndoStack.length - 1] : [];
+    await canvasRef.current.clearCanvas();
     if (previousPaths.length) {
-      await canvasRef.current.loadPaths(previousPaths)
+      await canvasRef.current.loadPaths(previousPaths);
     }
-    showTemporaryToast("Ångra")
-  }
+    showTemporaryToast("Ångra");
+  };
 
   const redo = async () => {
-    if (redoStack.length === 0 || !canvasRef.current) return
-    const newRedoStack = [...redoStack]
-    const nextPaths = newRedoStack.pop()
-    const currentPaths = await canvasRef.current.exportPaths()
-    setUndoStack((prev) => [...prev, currentPaths])
-    setRedoStack(newRedoStack)
+    if (redoStack.length === 0 || !canvasRef.current) return;
+    const newRedoStack = [...redoStack];
+    const nextPaths = newRedoStack.pop();
+    const currentPaths = await canvasRef.current.exportPaths();
+    setUndoStack((prev) => [...prev, currentPaths]);
+    setRedoStack(newRedoStack);
 
-    await canvasRef.current.clearCanvas()
+    await canvasRef.current.clearCanvas();
     if (nextPaths.length) {
-      await canvasRef.current.loadPaths(nextPaths)
+      await canvasRef.current.loadPaths(nextPaths);
     }
-    showTemporaryToast("Gör om")
-  }
+    showTemporaryToast("Gör om");
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-        e.preventDefault()
-        undoRef.current()
-      } else if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.shiftKey && e.key === "Z"))) {
-        e.preventDefault()
-        redoRef.current()
+        e.preventDefault();
+        undoRef.current();
+      } else if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === "y" || (e.shiftKey && e.key === "Z"))
+      ) {
+        e.preventDefault();
+        redoRef.current();
       } else if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault()
-        saveDrawingRef.current()
+        e.preventDefault();
+        saveDrawingRef.current();
         showTemporaryToast(
           <div className="flex gap-2 items-center">
             <Save /> Sparad
-          </div>,
-        )
+          </div>
+        );
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
-    undoRef.current = undo
-    redoRef.current = redo
-    saveDrawingRef.current = saveDrawing
-  }, [])
+    undoRef.current = undo;
+    redoRef.current = redo;
+    saveDrawingRef.current = saveDrawing;
+  }, []);
 
   return (
-    <div className="flex-1 flex flex-col bg-neutral-100 dark:bg-neutral-950 min-h-screen relative">
+    <div className="flex-1 flex flex-col bg-neutral-100 dark:bg-neutral-950 space:bg-gray-950 min-h-screen relative">
       {selectedPainting && (
         <>
-          <div className="sticky top-0 z-10 h-[80px] bg-neutral/95 dark:bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-700">
+          <div className="sticky top-0 z-10 h-[80px] bg-neutral/95 dark:bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-900">
             <div className="px-8 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 ms-6 lg:ms-0">
-                  <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                    <Paintbrush className="text-black dark:text-white" size={24} />
+                  <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-800 space:bg-indigo-900/60 flex items-center justify-center">
+                    <Paintbrush
+                      className="text-black dark:text-white space:text-purple-400"
+                      size={24}
+                    />
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                    <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 space:text-indigo-300">
                       {selectedPainting.name}
                     </h1>
                   </div>
@@ -205,7 +253,18 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
             <div className="flex-1 md:mr-0 mr-16 overflow-hidden relative">
               <div className="h-full">
                 <div className="bg-neutral-100 dark:bg-neutral-800 h-full">
-                  <div className="bg-neutral-100 dark:bg-neutral-950 h-full relative">
+                  <div
+                    className="bg-neutral-100 dark:bg-neutral-950 space:bg-gray-900  h-full relative"
+                    style={
+                      isSpace
+                        ? {
+                            backgroundImage: `url(${spaceImg})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }
+                        : {}
+                    }
+                  >
                     <ReactSketchCanvas
                       ref={canvasRef}
                       strokeWidth={strokeWidth}
@@ -228,23 +287,23 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
             </div>
 
             <div
-              className={`md:hidden fixed right-0 top-[80px] bottom-0 w-16 bg-neutral-100/95 dark:bg-neutral-950/95 backdrop-blur-sm border-l border-neutral-200 dark:border-neutral-700 z-20`}
+              className={`md:hidden fixed right-0 top-[80px] bottom-0 w-16 bg-neutral-100/95 dark:bg-neutral-950/95 space:bg-gray-950 backdrop-blur-sm border-l border-neutral-200 dark:border-neutral-700 space:border-indigo-900 z-20`}
             >
               <div className="flex flex-col items-center gap-4 p-3 h-full">
-                  <div
-                    className="w-10 h-10 rounded-full border-2 border-gray-200 shadow-sm cursor-pointer transition-transform duration-200 hover:scale-110"
-                    style={{ backgroundColor: selectedPainting.color }}
-                    onClick={() => colorInputRef.current.click()}
-                    title="Välj färg"
-                  />
-                  <input
-                    ref={colorInputRef}
-                    type="color"
-                    value={selectedPainting.color}
-                    onChange={(e) => handleColorChange(e.target.value)}
-                    className="absolute -top-20 -left-64 w-8 h-8 opacity-0 cursor-pointer"
-                    title="Välj färg"
-                  />
+                <div
+                  className="w-10 h-10 rounded-full border-2 border-gray-200 shadow-sm cursor-pointer transition-transform duration-200 hover:scale-110"
+                  style={{ backgroundColor: selectedPainting.color }}
+                  onClick={() => colorInputRef.current.click()}
+                  title="Välj färg"
+                />
+                <input
+                  ref={colorInputRef}
+                  type="color"
+                  value={selectedPainting.color}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  className="absolute -top-20 -left-64 w-8 h-8 opacity-0 cursor-pointer"
+                  title="Välj färg"
+                />
 
                 <div className="flex flex-col items-center gap-1">
                   <input
@@ -253,7 +312,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                     max="30"
                     value={strokeWidth}
                     onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                    className="w-12 h-8 text-center text-xs bg-neutral-200 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-600 rounded focus:outline-none focus:ring-1 focus:ring-neutral-500"
+                    className="w-12 h-8 text-center text-xs bg-neutral-200 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-600 rounded focus:outline-none focus:ring-1 focus:ring-neutral-500 space:bg-gray-900 space:text-indigo-400 space:border-indigo-950"
                     title="Ange penselstorlek (1-30)"
                   />
                 </div>
@@ -265,7 +324,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                     className={`p-2 rounded-lg transition-colors duration-200 ${
                       undoStack.length <= 1
                         ? "opacity-40 cursor-not-allowed text-neutral-400"
-                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 space:text-green-300 space:hover:bg-green-700"
                     }`}
                     title="Ångra"
                   >
@@ -278,7 +337,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                     className={`p-2 rounded-lg transition-colors duration-200 ${
                       redoStack.length === 0
                         ? "opacity-40 cursor-not-allowed text-neutral-400"
-                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 space:text-green-300 space:hover:bg-green-700"
                     }`}
                     title="Gör om"
                   >
@@ -290,7 +349,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                     className={`p-2 rounded-lg transition-colors duration-200 ${
                       isErasing
                         ? "bg-red-600 text-white hover:bg-red-700"
-                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 space:text-green-300 space:hover:bg-green-700"
                     }`}
                     title="Suddgummi"
                   >
@@ -299,23 +358,23 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
 
                   <button
                     onClick={() => setShowConfirm(true)}
-                    className="p-2 rounded-lg text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-200"
+                    className="p-2 rounded-lg text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors duration-200 space:text-red-300 space:hover:bg-red-700"
                     title="Rensa"
                   >
-                    <Paintbrush size={20} />
+                    <Trash size={20} />
                   </button>
 
                   <button
                     onClick={() => {
-                      const currentPaintingId = selectedPainting._id
-                      saveDrawing(currentPaintingId)
+                      const currentPaintingId = selectedPainting._id;
+                      saveDrawing(currentPaintingId);
                       showTemporaryToast(
                         <div className="flex gap-2 items-center">
                           <Save /> Sparad
-                        </div>,
-                      )
+                        </div>
+                      );
                     }}
-                    className="p-2 bg-gradient-to-r from-neutral-100 to-neutral-200 hover:from-neutral-200 hover:to-neutral-300 text-black rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                    className="p-2 bg-gradient-to-r from-neutral-100 to-neutral-200 hover:from-neutral-200 hover:to-neutral-300 text-black rounded-lg shadow-sm hover:shadow-md transition-all duration-200 space:text-green-900 space:from-green-400 space:to-green-500 space:hover:from-green-600 space:hover:to-green-700 space:hover:text-green-200"
                     title="Spara"
                   >
                     <Save size={20} />
@@ -325,7 +384,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
             </div>
           </div>
 
-          <div className="hidden md:block sticky bottom-0 bg-neutral-100/95 dark:bg-neutral-950/95 backdrop-blur-sm border-t border-neutral-200 dark:border-neutral-700 px-8 py-6 h-[95px]">
+          <div className="hidden md:block sticky bottom-0 bg-neutral-100/95 dark:bg-neutral-950/95 space:bg-gray-950 backdrop-blur-sm border-t border-neutral-200 dark:border-neutral-700 space:border-indigo-900  px-8 py-6 h-[95px]">
             <div className="max-w-3xl mx-auto flex items-center justify-between">
               <div
                 className="relative flex items-center gap-3 cursor-pointer"
@@ -345,14 +404,16 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                   title="Välj färg"
                 />
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Färg</span>
+                  <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 space:text-green-300 space:hover:bg-green-700">
+                    Färg
+                  </span>
                 </div>
               </div>
 
               <div className="flex flex-col items-center">
                 <label
                   htmlFor="strokeWidth"
-                  className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
+                  className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1 space:text-yellow-300"
                 >
                   Penselstorlek
                 </label>
@@ -363,10 +424,12 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                   max="30"
                   value={strokeWidth}
                   onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-300 rounded cursor-pointer appearance-none neutral-range"
+                  className="w-full h-2 bg-gray-300 space:bg-amber-300 rounded cursor-pointer appearance-none neutral-range"
                   title="Penselstorlek"
                 />
-                <span className="text-xs text-neutral-500 dark:text-neutral-400">{strokeWidth}px</span>
+                <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                  {strokeWidth}px
+                </span>
               </div>
 
               <div className="flex items-center gap-3">
@@ -377,7 +440,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                     ${
                       undoStack.length <= 1
                         ? "opacity-40 cursor-not-allowed dark:text-neutral-600"
-                        : "dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                        : "dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 space:text-green-300 space:hover:bg-green-700"
                     }`}
                   title="Ångra (Ctrl + Z)"
                 >
@@ -391,7 +454,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                     ${
                       redoStack.length === 0
                         ? "opacity-40 cursor-not-allowed dark:text-neutral-600"
-                        : "dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                        : "dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 space:text-green-300 space:hover:bg-green-700"
                     }`}
                   title="Gör om (Ctrl + Y)"
                 >
@@ -400,7 +463,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
 
                 <button
                   onClick={() => setShowConfirm(true)}
-                  className="px-4 py-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors duration-200 font-medium"
+                  className="px-4 py-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors duration-200 font-medium space:text-red-300 space:hover:bg-red-700 space:hover:text-red-100"
                   title="Rensa målning"
                 >
                   Rensa
@@ -411,7 +474,7 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
                   className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
                     isErasing
                       ? "bg-red-600 text-white hover:bg-red-700"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 space:text-green-300 space:hover:bg-green-700"
                   }`}
                   title="Aktivera suddgummi"
                 >
@@ -420,15 +483,15 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
 
                 <button
                   onClick={() => {
-                    const currentPaintingId = selectedPainting._id
-                    saveDrawing(currentPaintingId)
+                    const currentPaintingId = selectedPainting._id;
+                    saveDrawing(currentPaintingId);
                     showTemporaryToast(
                       <div className="flex gap-2 items-center">
                         <Save /> Sparad
-                      </div>,
-                    )
+                      </div>
+                    );
                   }}
-                  className="px-6 py-2 bg-neutral-300 hover:bg-neutral-300/80 text-black rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium flex items-center gap-2"
+                  className="px-6 py-2 bg-neutral-300 hover:bg-neutral-300/80 text-black rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium flex items-center gap-2 space:bg-green-400 space:text-green-900 space:hover:bg-green-700 space:hover:text-green-200"
                   title="Spara målning (Ctrl + S)"
                 >
                   <Save />
@@ -440,9 +503,11 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
       )}
 
       <div
-        className={`fixed top-24 right-24 md:right-4 bg-neutral-700 text-white px-6 py-3 rounded-lg shadow-lg font-semibold
+        className={`fixed top-24 right-24 md:right-4 bg-neutral-700 space:bg-gray-950 space:text-indigo-200 text-white px-6 py-3 rounded-lg shadow-lg font-semibold
           transition-opacity duration-300 ${
-            showToast ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            showToast
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
           }`}
         role="alert"
         aria-live="polite"
@@ -454,12 +519,12 @@ export default function PaintArea({ setSelectedPainting, selectedPainting, updat
         <ConfirmClearModal
           message={`Är du säker på att du vill rensa målningen?`}
           onConfirm={() => {
-            clearCanvas()
-            setShowConfirm(false)
+            clearCanvas();
+            setShowConfirm(false);
           }}
           onCancel={() => setShowConfirm(false)}
         />
       )}
     </div>
-  )
+  );
 }

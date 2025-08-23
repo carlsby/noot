@@ -91,28 +91,28 @@ export default function Sidebar({
               : "-translate-x-full lg:translate-x-0"
           }
           flex flex-col
-          bg-neutral-100 dark:bg-neutral-950
-          border-r border-neutral-200 dark:border-neutral-700
+          bg-neutral-100 dark:bg-neutral-950 space:bg-gray-950
+          border-r border-neutral-200 dark:border-neutral-700 space:border-indigo-900
           shadow-xl lg:shadow-none
           overflow-hidden
         `}
       >
-        <div className="lg:hidden flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700">
+        <div className="lg:hidden flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-400">
           {settings ? (
             <div className="flex items-center gap-3 w-full">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-                <Settings className="text-gray-500" />
+                <Settings className="text-gray-500 space:text-green-400" />
               </div>
               <div className="flex-1">
-                <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
+                <h1 className="font-bold text-neutral-900 dark:text-neutral-100 space:text-indigo-400">
                   Inställningar
                 </h1>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 space:text-indigo-400/50">
                   Anpassa Noot
                 </p>
               </div>
               <X
-                className="text-gray-500 hover:text-black dark:hover:text-gray-400 cursor-pointer"
+                className="text-gray-500 hover:text-black dark:hover:text-gray-400 cursor-pointer space:text-red-400 space:hover:text-red-700"
                 onClick={() => setSettings(false)}
               />
             </div>
@@ -127,7 +127,7 @@ export default function Sidebar({
                   />
                 </div>
                 <div>
-                  <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
+                  <h1 className="font-bold text-neutral-900 dark:text-neutral-100 space:text-indigo-400">
                     Noot
                   </h1>
                 </div>
@@ -135,14 +135,14 @@ export default function Sidebar({
               <div className="flex gap-2">
                 <button
                   onClick={() => setSettings(true)}
-                  className=" text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
+                  className=" text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors space:text-green-400 space:hover:text-green-700"
                 >
                   <Settings size={24} />
                 </button>
 
                 <button
                   onClick={closeMobileMenu}
-                  className=" text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
+                  className=" text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors space:text-red-400 space:hover:text-red-700"
                   aria-label="Close menu"
                 >
                   <X size={24} />
@@ -162,7 +162,7 @@ export default function Sidebar({
         ) : (
           <>
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700">
+              <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-900">
                 <div className="flex items-center gap-3 w-full">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center">
                     <img
@@ -172,12 +172,12 @@ export default function Sidebar({
                     />
                   </div>
                   <div className="flex-1">
-                    <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
+                    <h1 className="font-bold text-neutral-900 dark:text-neutral-100 space:text-indigo-400">
                       Noot
                     </h1>
                   </div>
                   <Settings
-                    className="text-black dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"
+                    className="text-black dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer space:text-green-400 space:hover:text-green-700"
                     onClick={() => setSettings(true)}
                   />
                 </div>
@@ -218,7 +218,7 @@ export default function Sidebar({
                 )}
               </div>
 
-              <div className="mt-auto flex items-center justify-center border-t px-8 border-neutral-200 dark:border-neutral-700 h-[95px]">
+              <div className="mt-auto flex items-center justify-center border-t px-8 border-neutral-200 dark:border-neutral-700 h-[95px] space:border-indigo-900">
                 {activeTab === "note" ? (
                   <AddCategoryForm addCategory={addCategory} />
                 ) : (
