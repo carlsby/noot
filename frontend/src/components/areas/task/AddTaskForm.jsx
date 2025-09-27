@@ -10,9 +10,16 @@ export default function AddTaskForm({ addTask }) {
 
   useEffect(() => {
     function handleKeyDown(e) {
+      console.log(e);
       if (e.ctrlKey && e.key === "n") {
         e.preventDefault();
         setInputToggle((prev) => !prev);
+      }
+
+      if (e.shiftLeft && e.key === "enter") {
+        e.preventDefault();
+        console.log("hjallå");
+      } else if (e.key === "enter") {
       }
     }
 
@@ -41,30 +48,39 @@ export default function AddTaskForm({ addTask }) {
             : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 space:bg-green-500 space:border-green-600"
         }`}
       >
-        <input
+        <textarea
           ref={inputRef}
           type="text"
-          className="flex-1 bg-transparent border-none outline-none text-neutral-900 dark:text-neutral-100 space:text-indigo-950 placeholder-neutral-500 dark:placeholder-neutral-400 space:placeholder:text-indigo-950 text-sm"
+          className="flex-1 bg-transparent border-none outline-none resize-none text-neutral-900 dark:text-neutral-100 space:text-indigo-950 placeholder-neutral-500 dark:placeholder-neutral-400 space:placeholder:text-indigo-950 text-sm pr-40"
           placeholder="Lägg till en ny anteckning..."
           value={newTaskText}
           onChange={(e) => setNewTaskText(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault(); 
+              handleAddTask();
+            }
+          }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
         <button
-          className={`p-2.5 bg-neutral-300 me-1 hover:bg-neutral-300/80 text-black rounded-lg transition-colors shadow-sm hover:shadow-md ${newTaskText.trim() === "" ? "bg-neutral-300 dark:bg-neutral-900 space:bg-green-700 cursor-not-allowed" : "bg-neutral-300 space:bg-green-950 space:text-white hover:bg-neutral-300/80"}`}
+          className={`p-2.5 bg-neutral-300 me-1 hover:bg-neutral-300/80 text-black rounded-lg transition-colors shadow-sm hover:shadow-md ${
+            newTaskText.trim() === ""
+              ? "bg-neutral-300 dark:bg-neutral-900 space:bg-green-700 cursor-not-allowed"
+              : "bg-neutral-300 space:bg-green-950 space:text-white hover:bg-neutral-300/80"
+          }`}
           onClick={handleAddTask}
           disabled={newTaskText.trim() === ""}
         >
           <Plus size={20} />
         </button>
       </div>
-      <div className="hidden md:block text-xs text-neutral-500 dark:text-neutral-400 space:bg-indigo-950 text-center absolute right-14 top-1">
+      {/* <div className="hidden md:block text-xs text-neutral-500 dark:text-neutral-400 space:bg-indigo-950 text-center absolute right-14 top-1">
         <kbd className="px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-950 rounded text-xs space:bg-indigo-950 space:text-indigo-200">
           Ctrl+N
         </kbd>
-      </div>
+      </div> */}
     </div>
   );
 }

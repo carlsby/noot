@@ -4,28 +4,23 @@ import { Moon, Sun, Rocket, ChevronDown } from "lucide-react"
 const THEMES = [
   { value: "light", label: "Ljust läge", icon: <Sun size={16} className="text-yellow-500" /> },
   { value: "dark", label: "Mörkt läge", icon: <Moon size={16} className="text-gray-400" /> },
-  { value: "space", label: "Rymd-läge", icon: <Rocket size={16} className="text-indigo-400" /> },
+  // { value: "space", label: "Rymd-läge", icon: <Rocket size={16} className="text-indigo-400" /> },
 ]
 
-export default function ThemeDropdown() {
+export default function ThemeDropdown({ fetchTheme }) {
   const [theme, setTheme] = useState("light")
   const [isOpen, setIsOpen] = useState(false)
+  const [loading, setLoading] = useState(false);
+
+  const getCurrentTheme = async () => {
+    setLoading(true);
+    let result = await fetchTheme();
+    setTheme(result);
+        setLoading(false);
+  }
 
   useEffect(() => {
-    async function fetchTheme() {
-      try {
-        const saved = await window.electronAPI.invoke("get-color-mode")
-        if (THEMES.map(t => t.value).includes(saved)) {
-          setTheme(saved)
-          applyTheme(saved)
-        }
-      } catch (err) {
-        console.error("Failed to get theme:", err)
-        setTheme("light")
-        applyTheme("light")
-      }
-    }
-    fetchTheme()
+    getCurrentTheme();
   }, [])
 
   const applyTheme = (newTheme) => {
@@ -34,10 +29,9 @@ export default function ThemeDropdown() {
   }
 
   const handleSelect = async (newTheme) => {
+    setIsOpen(false);
     setTheme(newTheme)
     applyTheme(newTheme)
-    setIsOpen(false)
-
     try {
       await window.electronAPI.invoke("set-color-mode", newTheme)
     } catch (err) {
@@ -48,6 +42,7 @@ export default function ThemeDropdown() {
   const selectedTheme = THEMES.find(t => t.value === theme)
 
   return (
+    !loading &&
     <div className="flex flex-col w-full relative">
       <button
         onClick={() => setIsOpen(!isOpen)}

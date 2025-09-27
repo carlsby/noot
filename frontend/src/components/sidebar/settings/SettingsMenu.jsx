@@ -8,6 +8,7 @@ export default function SettingsMenu({
   getAllFonts,
   setDefaultFont,
   fontCss,
+  fetchTheme
 }) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -17,7 +18,7 @@ export default function SettingsMenu({
             <Settings className="text-gray-500" />
           </div>
           <div className="flex-1">
-            <h1 className="font-bold text-neutral-900 dark:text-neutral-100">
+            <h1 className="font-bold text-neutral-900 dark:text-neutral-100 space:text-indigo-400">
               Inställningar
             </h1>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -36,7 +37,7 @@ export default function SettingsMenu({
           <li className="group border-b dark:border-gray-700 space:border-green-950 text-sm">
             <div className="group relative transition-all duration-300 ease-out hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
               <div className="w-full flex items-center gap-3 text-left relative">
-                <DarkModeToggle />
+                <DarkModeToggle fetchTheme={fetchTheme} />
               </div>
             </div>
           </li>

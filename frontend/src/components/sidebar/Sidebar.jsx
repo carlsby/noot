@@ -26,6 +26,7 @@ export default function Sidebar({
   getAllFonts,
   setDefaultFont,
   fontCss,
+  fetchTheme
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [settings, setSettings] = useState(false);
@@ -158,6 +159,7 @@ export default function Sidebar({
             getAllFonts={getAllFonts}
             setDefaultFont={setDefaultFont}
             fontCss={fontCss}
+            fetchTheme={fetchTheme}
           />
         ) : (
           <>

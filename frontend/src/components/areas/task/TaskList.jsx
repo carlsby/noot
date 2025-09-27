@@ -100,6 +100,7 @@ export default function TaskList({
           <ul
             {...provided.droppableProps}
             ref={provided.innerRef}
+            className="h-full"
           >
             {localTasks.map((task, index) => (
               <Draggable key={task._id} draggableId={task._id} index={index}>

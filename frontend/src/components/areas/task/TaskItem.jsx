@@ -148,7 +148,7 @@ export default function TaskItem({
           <span
             onDoubleClick={() => setEditingTaskId(task._id)}
             title="Dubbelklicka för att redigera"
-            className={`flex-1 cursor-pointer text-sm transition-colors ${
+            className={`flex-1 cursor-pointer text-sm transition-colors whitespace-pre-line ${
               task.completed
                 ? "line-through text-neutral-500 space:text-indigo-950/40"
                 : "text-neutral-900 dark:text-neutral-100 space:text-indigo-950"

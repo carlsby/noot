@@ -12,55 +12,10 @@ export default function TaskArea({
   deleteTask,
   updateTaskOrder,
 }) {
-  const [isSpace, setIsSpace] = useState(false);
-
-  useEffect(() => {
-    async function fetchTheme() {
-      try {
-        const mode = await window.electronAPI.invoke("get-color-mode");
-        const THEMES = ["light", "dark", "space", "robot"];
-
-        document.documentElement.classList.remove(...THEMES);
-        if (THEMES.includes(mode)) {
-          document.documentElement.classList.add(mode);
-        } else {
-          document.documentElement.classList.add("light");
-        }
-
-        setIsSpace(mode === "space");
-      } catch (err) {
-        console.error("Failed to get color mode:", err);
-        document.documentElement.classList.remove("dark", "space", "robot");
-        document.documentElement.classList.add("light");
-        setIsSpace(false);
-      }
-    }
-
-    fetchTheme();
-
-    const observer = new MutationObserver(() => {
-      setIsSpace(document.documentElement.classList.contains("space"));
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div
       className="flex-1 flex flex-col min-h-screen bg-neutral-100 dark:bg-neutral-950"
-      style={
-        isSpace
-          ? {
-              backgroundImage: `url(${spaceImg})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }
-          : {}
-      }
     >
       <div className="sticky top-0 z-10 h-[80px] bg-neutral-100/95 dark:bg-neutral-950/95 space:bg-gray-950 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-900">
         <div className="px-8 py-4">
@@ -83,7 +38,6 @@ export default function TaskArea({
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-8 py-6">
-        <div>
           <TaskList
             tasks={filteredTasks}
             updateTask={updateTask}
@@ -92,7 +46,6 @@ export default function TaskArea({
             updateTaskOrder={updateTaskOrder}
             categoryColor={currentCategory?.color}
           />
-        </div>
       </div>
       <div className="sticky bottom-0 bg-neutral-100/95 dark:bg-neutral-950 backdrop-blur-sm border-t px-8 border-neutral-200 dark:border-neutral-700 space:border-indigo-900 space:bg-gray-950 flex items-center justify-center h-[95px]">
         <div className="max-w-3xl w-full mx-auto">

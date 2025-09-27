@@ -17,6 +17,7 @@ export default function App() {
     fetchData();
     loadSelectedCategory();
     loadFont();
+    fetchTheme();
   }, []);
 
   async function fetchData() {
@@ -228,30 +229,27 @@ export default function App() {
     }
   };
 
-useEffect(() => {
   async function fetchTheme() {
     try {
-      const mode = await window.electronAPI.invoke("get-color-mode")
+      const mode = await window.electronAPI.invoke("get-color-mode");
 
-      const THEMES = ["light", "dark", "space", "robot"]
+      const THEMES = ["light", "dark", "space", "robot"];
 
-      document.documentElement.classList.remove(...THEMES)
+      document.documentElement.classList.remove(...THEMES);
 
       if (THEMES.includes(mode)) {
-        document.documentElement.classList.add(mode)
+        document.documentElement.classList.add(mode);
+        return mode;
       } else {
-        document.documentElement.classList.add("light")
+        document.documentElement.classList.add("light");
+        return "light";
       }
     } catch (err) {
-      console.error("Failed to get color mode:", err)
-      document.documentElement.classList.remove("dark", "space", "robot")
-      document.documentElement.classList.add("light")
+      console.error("Failed to get color mode:", err);
+      document.documentElement.classList.remove("dark", "space", "robot");
+      document.documentElement.classList.add("light");
     }
   }
-
-  fetchTheme()
-}, [])
-
 
 
   return (
@@ -279,6 +277,7 @@ useEffect(() => {
         getAllFonts={getAllFonts}
         setDefaultFont={setDefaultFont}
         fontCss={fontCss}
+        fetchTheme={fetchTheme}
       />
       {paintMode ? (
         <PaintArea
