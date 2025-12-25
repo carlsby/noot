@@ -1,7 +1,7 @@
 <img src="/frontend/src/assets/noot.png" alt="Noot Logo" width="64" style="vertical-align: middle;" />
 
 # Noot
-**Noot** is a lightweight desktop application built using **Electron** and **React**, with **NeoDB** as the backend database.  
+**Noot** is a lightweight desktop application built using **Electron** and **React**, with **NeDB** as the backend database.  
 It’s designed to be fast, intuitive, and run natively across platforms using web technologies.
 
 ---
@@ -41,6 +41,6 @@ Navigate to the dist/ folder and run the installer to install Noot on your syste
 
 
 ## Tech stack
-⚛️ React – For the dynamic frontend UI <br/>
-⚡ Electron – For building the cross-platform desktop application <br/>
-🗃️ NeoDB – A lightweight, local-first database <br/>
+<b>React</b> - For the dynamic frontend UI <br/>
+<b>Electron</b> – For building the cross-platform desktop application <br/>
+<b>NeDB</b> – A lightweight, local-first database <br/>
