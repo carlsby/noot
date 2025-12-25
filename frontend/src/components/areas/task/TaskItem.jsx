@@ -1,13 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  CheckCircle,
-  Circle,
-  Edit,
-  Trash,
-  Save,
-  X,
-  GripVertical,
-} from "lucide-react";
+import { GripVertical } from "lucide-react";
 import { ConfirmModal } from "../../shared/ConfirmModal";
 
 export default function TaskItem({
@@ -23,8 +15,10 @@ export default function TaskItem({
   const isEditing = editingTaskId === task._id;
   const [editText, setEditText] = useState(task.text);
   const [showConfirm, setShowConfirm] = useState(false);
-
+  const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
+  const textareaRef = useRef(null);
   const editContainerRef = useRef(null);
+  const contextMenuRef = useRef(null);
 
   const handleSave = () => {
     if (editText.trim() === "") return;
@@ -38,8 +32,15 @@ export default function TaskItem({
   };
 
   useEffect(() => {
-    if (!isEditing) return;
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+  }, [editText, isEditing]);
 
+  useEffect(() => {
+    if (!isEditing) return;
     const handleClickOutside = (event) => {
       if (
         editContainerRef.current &&
@@ -48,129 +49,150 @@ export default function TaskItem({
         handleSave();
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isEditing, editText]);
 
-  if (isEditing) {
-    return (
-      <div
-        ref={editContainerRef}
-        className="bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 space:bg-green-600 space:border-green-700 p-1 shadow-sm"
-      >
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              toggleTaskCompletion(task._id);
-              setEditingTaskId(null);
-            }}
-            className="flex-shrink-0 text-neutral-400 hover:text-emerald-500 transition-colors"
-            title={task.completed ? "Gör ofärdig" : "Markera som färdig"}
-          >
-            {task.completed ? (
-              <CheckCircle size={20} className="text-emerald-500 space:text-indigo-950/40" />
-            ) : (
-              <Circle className="space:text-indigo-950" size={20} />
-            )}
-          </button>
+  const handleContextMenu = (e) => {
+    e.preventDefault();
 
-          <input
-            type="text"
-            className="flex-1 bg-transparent border-none outline-none text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 text-sm"
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSave();
-              if (e.key === "Escape") handleCancel();
-            }}
-            autoFocus
-            placeholder="Skriv din anteckning..."
-          />
+    const menuWidth = 180;
+    const menuHeight = 120;
 
-          <div className="flex items-center gap-1">
-            <button
-              className="p-2 text-neutral-400 hover:text-black dark:hover-text-white hover:bg-neutral-300 dark:hover:bg-neutral-900/20 space:text-indigo-950 hover:space:bg-indigo-900 hover:space:text-white rounded-lg transition-colors"
-              onClick={handleSave}
-              title="Spara"
-            >
-              <Save size={16} />
-            </button>
-            <button
-              className="p-2 text-neutral-400 hover:text-black dark:hover-text-white hover:bg-neutral-300 dark:hover:bg-neutral-900/20 space:text-indigo-950 hover:space:bg-gray-950 hover:space:text-white rounded-lg transition-colors"
-              onClick={handleCancel}
-              title="Avbryt"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if (x + menuWidth > window.innerWidth) {
+      x = window.innerWidth - menuWidth - 8;
+    }
+
+    if (y + menuHeight > window.innerHeight) {
+      y = window.innerHeight - menuHeight - 8;
+    }
+
+    setContextMenu({ show: true, x, y });
+  };
+
+  const closeContextMenu = () => setContextMenu({ show: false, x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target)
+      ) {
+        closeContextMenu();
+      }
+    };
+    if (contextMenu.show) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [contextMenu.show]);
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      const el = textareaRef.current;
+      const len = el.value.length;
+
+      el.focus();
+      el.setSelectionRange(len, len);
+    }
+  }, [isEditing]);
+
+  // för ta bort modalen
+  const truncated =
+    task.text.length > 40 ? task.text.slice(0, 40) + "..." : task.text;
 
   return (
     <>
-      <div
-        {...dragHandleProps}
-        className={`group bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-1 hover:border-neutral-300 dark:hover:border-neutral-600 space:bg-green-500 space:border-green-600 transition-all duration-200 cursor-grab active:cursor-grabbing ${
-          task.completed ? "opacity-60" : ""
-        } ${
-          isDragging
-            ? "shadow-lg border-neutral-300 dark:border-neutral-600"
-            : "hover:shadow-sm"
-        }`}
-      >
+      {isEditing ? (
         <div
-          className="flex items-center gap-3"
-          title="Flytta genom dra och släpp"
+          ref={editContainerRef}
+          className="bg-white dark:bg-neutral-900/60 p-3 shadow-sm transition-all border border-neutral-400 dark:border-neutral-700"
         >
-          <div className="flex-shrink-0 opacity-30 group-hover:opacity-60 transition-opacity">
-            <GripVertical size={16} className="text-neutral-400 space:text-indigo-950" />
-          </div>
-
-          <button
-            onClick={() => toggleTaskCompletion(task._id)}
-            className="flex-shrink-0 text-neutral-400 hover:text-emerald-500 transition-colors"
-            title={
-              task.completed ? "Markera som ofärdig" : "Markera som färdig"
-            }
-          >
-            {task.completed ? (
-              <CheckCircle size={20} className="text-emerald-500 space:text-indigo-950/40" />
-            ) : (
-              <Circle className="space:text-indigo-950" size={20} />
-            )}
-          </button>
-
-          <span
-            onDoubleClick={() => setEditingTaskId(task._id)}
-            title="Dubbelklicka för att redigera"
-            className={`flex-1 cursor-pointer text-sm transition-colors whitespace-pre-line ${
-              task.completed
-                ? "line-through text-neutral-500 space:text-indigo-950/40"
-                : "text-neutral-900 dark:text-neutral-100 space:text-indigo-950"
-            }`}
-          >
-            {task.text}
-          </span>
-
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 space:bg-red-900 space:text-red-400 space:hover:bg-red-950 rounded-lg transition-colors"
-              onClick={() => setShowConfirm(true)}
-              title="Radera"
-            >
-              <Trash size={16} />
-            </button>
+          <div className="flex items-start gap-3">
+            <div className="flex flex-col gap-2 flex-shrink-0 items-center">
+              <div className="opacity-30 group-hover:opacity-60">
+                <GripVertical size={16} className="text-neutral-400" />
+              </div>
+            </div>
+            <textarea
+              ref={textareaRef}
+              className="flex-1 resize-none bg-transparent border-none outline-none text-neutral-900 dark:text-neutral-100 text-sm placeholder-neutral-400 p-1"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSave();
+                }
+                if (e.key === "Escape") handleCancel();
+              }}
+              autoFocus
+              placeholder="Skriv din anteckning..."
+            />
           </div>
         </div>
-      </div>
+      ) : (
+        <div
+          {...dragHandleProps}
+          className={`group bg-white dark:bg-neutral-900/60 p-3 border border-transparent hover:border-neutral-400 dark:hover:border-neutral-800 transition-all duration-200 cursor-grab active:cursor-grabbing ${
+            task.completed ? "opacity-40 line-through" : ""
+          } ${
+            isDragging
+              ? "shadow-lg border-neutral-400 dark:border-neutral-600"
+              : "hover:shadow-sm"
+          }`}
+          onDoubleClick={() => setEditingTaskId(task._id)}
+          onContextMenu={handleContextMenu}
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex flex-col gap-2 flex-shrink-0 items-center">
+              <div className="opacity-30 group-hover:opacity-60">
+                <GripVertical size={16} className="text-neutral-400" />
+              </div>
+            </div>
+
+            <span className="flex-1 text-sm whitespace-pre-line text-neutral-900 dark:text-neutral-100">
+              {task.text}
+            </span>
+          </div>
+
+          {contextMenu.show && (
+            <div
+              ref={contextMenuRef}
+              className="absolute z-[70] bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 shadow-2xl py-2 min-w-[160px] p-2"
+              style={{ left: contextMenu.x + "px", top: contextMenu.y + "px" }}
+            >
+              <button
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                onClick={() => {
+                  toggleTaskCompletion(task._id);
+                  closeContextMenu();
+                }}
+              >
+                {task.completed ? "Markera som ofärdig" : "Markera som färdig"}
+              </button>
+              <div className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
+              <button
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                onClick={() => {
+                  setShowConfirm(true);
+                  closeContextMenu();
+                }}
+              >
+                Radera
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {showConfirm && (
         <ConfirmModal
-          message={`Är du säker på att du vill ta bort anteckningen "${task.text}"?`}
+          message={`Är du säker på att du vill ta bort anteckningen "${truncated}"?`}
           onConfirm={() => {
             deleteTask(task._id);
             setShowConfirm(false);

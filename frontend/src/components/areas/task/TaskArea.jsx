@@ -1,8 +1,6 @@
 import TaskList from "./TaskList";
 import AddTaskForm from "./AddTaskForm";
-import { NotebookPen } from "lucide-react";
-import spaceImg from "../../../assets/space.jpg";
-import { useEffect, useState } from "react";
+import { BookText } from "lucide-react";
 export default function TaskArea({
   currentCategory,
   filteredTasks,
@@ -18,10 +16,10 @@ export default function TaskArea({
       className="flex-1 flex flex-col min-h-screen bg-neutral-100 dark:bg-neutral-950"
     >
       <div className="sticky top-0 z-10 h-[80px] bg-neutral-100/95 dark:bg-neutral-950/95 space:bg-gray-950 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-900">
-        <div className="px-8 py-4">
+        <div className="p-4">
           <div className="flex items-center gap-4 ms-6 lg:ms-0">
-            <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-800 space:bg-indigo-900/60  flex items-center justify-center">
-              <NotebookPen
+            <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-900 space:bg-indigo-900/60 flex items-center justify-center">
+              <BookText
                 style={{ color: currentCategory?.color }}
                 size={24}
               />
@@ -37,7 +35,7 @@ export default function TaskArea({
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-8 py-6">
+      <div className="flex-1 overflow-y-auto m-4">
           <TaskList
             tasks={filteredTasks}
             updateTask={updateTask}

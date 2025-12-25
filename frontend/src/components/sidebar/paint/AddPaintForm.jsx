@@ -13,7 +13,7 @@ export default function AddPaintForm({ addPainting }) {
 
   return (
     <div
-      className={`flex items-center gap-3 p-3 h-[50px] bg-neutral-50 dark:bg-black rounded-xl border transition-all duration-200 ${
+      className={`flex items-center gap-3 p-3 h-[50px] bg-neutral-50 dark:bg-black border transition-all duration-200 ${
         isFocused
           ? "border-neutral-300 dark:border-neutral-600 bg-white dark:bg-black space:bg-green-600 space:border-green-700"
           : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 space:bg-green-500 space:border-green-500"
@@ -33,7 +33,7 @@ export default function AddPaintForm({ addPainting }) {
         onBlur={() => setIsFocused(false)}
       />
       <button
-        className={`p-2  text-black rounded-lg transition-colors shadow-sm ${newPaintingName.trim() === "" ? "bg-neutral-300 dark:bg-neutral-900 space:bg-green-700 cursor-not-allowed" : "bg-neutral-300 hover:bg-neutral-300/80 space:bg-green-950 space:text-white"}`}
+        className={`p-2  text-black transition-colors shadow-sm ${newPaintingName.trim() === "" ? "bg-neutral-300 dark:bg-neutral-900 space:bg-green-700 cursor-not-allowed" : "bg-neutral-300 hover:bg-neutral-300/80 space:bg-green-950 space:text-white"}`}
         onClick={handleAddPainting}
         disabled={newPaintingName.trim() === ""}
       >

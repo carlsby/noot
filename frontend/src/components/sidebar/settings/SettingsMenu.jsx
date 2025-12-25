@@ -14,7 +14,7 @@ export default function SettingsMenu({
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700">
         <div className="flex items-center gap-3 w-full">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 flex items-center justify-center">
             <Settings className="text-gray-500" />
           </div>
           <div className="flex-1">

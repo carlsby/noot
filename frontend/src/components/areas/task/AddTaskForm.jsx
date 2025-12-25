@@ -10,7 +10,6 @@ export default function AddTaskForm({ addTask }) {
 
   useEffect(() => {
     function handleKeyDown(e) {
-      console.log(e);
       if (e.ctrlKey && e.key === "n") {
         e.preventDefault();
         setInputToggle((prev) => !prev);
@@ -18,7 +17,6 @@ export default function AddTaskForm({ addTask }) {
 
       if (e.shiftLeft && e.key === "enter") {
         e.preventDefault();
-        console.log("hjallå");
       } else if (e.key === "enter") {
       }
     }
@@ -42,7 +40,7 @@ export default function AddTaskForm({ addTask }) {
   return (
     <div className="space-y-3 relative">
       <div
-        className={`flex items-center gap-3 ps-2 h-[50px] bg-white dark:bg-black rounded-xl border transition-all duration-200 ${
+        className={`flex items-center gap-3 ps-2 h-[50px] bg-white dark:bg-black border transition-all duration-200 ${
           isFocused
             ? "border-neutral-300 dark:border-neutral-600 shadow-lg shadow-neutral-100/50 dark:shadow-neutral-900/20 space:bg-green-600 space:border-green-700 space:shadow-green-900/20"
             : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 space:bg-green-500 space:border-green-600"
@@ -51,7 +49,7 @@ export default function AddTaskForm({ addTask }) {
         <textarea
           ref={inputRef}
           type="text"
-          className="flex-1 bg-transparent border-none outline-none resize-none text-neutral-900 dark:text-neutral-100 space:text-indigo-950 placeholder-neutral-500 dark:placeholder-neutral-400 space:placeholder:text-indigo-950 text-sm pr-40"
+          className="flex-1 pt-1 bg-transparent border-none outline-none resize-none text-neutral-900 dark:text-neutral-100 space:text-indigo-950 placeholder-neutral-500 dark:placeholder-neutral-400 space:placeholder:text-indigo-950 text-sm pr-1"
           placeholder="Lägg till en ny anteckning..."
           value={newTaskText}
           onChange={(e) => setNewTaskText(e.target.value)}
@@ -65,7 +63,7 @@ export default function AddTaskForm({ addTask }) {
           onBlur={() => setIsFocused(false)}
         />
         <button
-          className={`p-2.5 bg-neutral-300 me-1 hover:bg-neutral-300/80 text-black rounded-lg transition-colors shadow-sm hover:shadow-md ${
+          className={`p-2.5 bg-neutral-300 me-1 hover:bg-neutral-300/80 text-black transition-colors shadow-sm hover:shadow-md ${
             newTaskText.trim() === ""
               ? "bg-neutral-300 dark:bg-neutral-900 space:bg-green-700 cursor-not-allowed"
               : "bg-neutral-300 space:bg-green-950 space:text-white hover:bg-neutral-300/80"

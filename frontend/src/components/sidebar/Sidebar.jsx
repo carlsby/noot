@@ -3,7 +3,6 @@ import { Menu, Settings, X } from "lucide-react";
 import CategoryList from "./category/CategoryList";
 import AddCategoryForm from "./category/AddCategoryForm";
 import NootLogo from "../../assets/noot.png";
-import TabNavigation from "./TabNavigation";
 import PaintList from "./paint/PaintList";
 import AddPaintForm from "./paint/AddPaintForm";
 import SettingsMenu from "./settings/SettingsMenu";
@@ -101,7 +100,7 @@ export default function Sidebar({
         <div className="lg:hidden flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-400">
           {settings ? (
             <div className="flex items-center gap-3 w-full">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 flex items-center justify-center">
                 <Settings className="text-gray-500 space:text-green-400" />
               </div>
               <div className="flex-1">
@@ -120,7 +119,7 @@ export default function Sidebar({
           ) : (
             <>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 flex items-center justify-center">
                   <img
                     src={NootLogo || "/placeholder.svg"}
                     className="w-25 h-25"
@@ -166,7 +165,7 @@ export default function Sidebar({
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className="hidden lg:flex h-[80px] items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-700 space:border-indigo-900">
                 <div className="flex items-center gap-3 w-full">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 flex items-center justify-center">
                     <img
                       src={NootLogo || "/placeholder.svg"}
                       className="w-25 h-25"
@@ -185,13 +184,13 @@ export default function Sidebar({
                 </div>
               </div>
 
-              <TabNavigation
+              {/* <TabNavigation
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 setPaintMode={setPaintMode}
                 setSelectedPainting={setSelectedPainting}
                 paintings={paintings}
-              />
+              /> */}
 
               <div className="flex-1 overflow-y-auto ">
                 {activeTab === "note" ? (
