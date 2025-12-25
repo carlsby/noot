@@ -6,7 +6,7 @@ It’s designed to be fast, intuitive, and run natively across platforms using w
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to install and run **Noot** locally on your machine.
 
