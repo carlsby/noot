@@ -34,14 +34,14 @@ export default function SettingsMenu({
 
       <div className="h-full">
         <ul>
-          <li className="group border-b dark:border-gray-700 space:border-green-950 text-sm">
+          <li className="group border-b dark:border-neutral-700 space:border-green-950 text-sm">
             <div className="group relative transition-all duration-300 ease-out hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
               <div className="w-full flex items-center gap-3 text-left relative">
                 <DarkModeToggle fetchTheme={fetchTheme} />
               </div>
             </div>
           </li>
-          <li className="group border-b dark:border-gray-700 space:border-green-950 text-sm">
+          <li className="group border-b dark:border-neutral-700 space:border-green-950 text-sm">
             <div className="group relative transition-all duration-300 ease-out hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
               <div className="w-full flex items-center gap-3 text-left relative">
                 <FontSelector

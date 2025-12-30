@@ -81,3 +81,10 @@ body {
   cursor: pointer;
   box-shadow: 0 0 4px rgba(124, 58, 237, 0.7);
 }
+
+
+.dragging {
+  max-width: 100% !important;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}

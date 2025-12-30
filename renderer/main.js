@@ -2,55 +2,70 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const db = require("./db.js");
 
+// initializes fonts on startup
 db.initializeFonts();
 
+// color generator (for random colors on categories)
 function randomColor() {
-  const colors = [
-    "#FF9F40",
-    "#5E9EFF",
-    "#66D4CF",
-    "#FF6B6B",
-    "#B39DDB",
-    "#FFCC80",
-    "#81C784",
-    "#4FC3F7",
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
+  const c = () =>
+    Math.floor(Math.random() * 129 + 64)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${c()}${c()}${c()}`;
 }
 
+// IPC Handlers
+// everything that's being sent to the frontend
+
 function setupIpcHandlers() {
-  ipcMain.handle("get-categories", async () => {
-    return await db.getCategories();
+  // categories
+  ipcMain.handle("get-categories", () => db.getCategories());
+  ipcMain.handle("add-category", (_, name) => {
+    return db.addCategory({ name, color: randomColor() });
   });
-
-  ipcMain.handle("add-category", async (_, name) => {
-    const newCategory = { name, color: randomColor() };
-    return await db.addCategory(newCategory);
+  ipcMain.handle("add-category-to-folder", (_, { name, folderId }) => {
+    return db.addCategoryToFolder({ name }, folderId);
   });
-
-  ipcMain.handle("update-category", async (_, { id, name }) => {
-    await db.updateCategory(id, { name });
-    return await db.getCategories();
+  ipcMain.handle("update-category", (_, { id, name }) => {
+    return db.updateCategory(id, { name });
   });
+  ipcMain.handle("delete-category", (_, id) => db.deleteCategory(id));
+  ipcMain.handle("set-selected-category", (_, categoryId) =>
+    db.setSelectedCategory(categoryId)
+  );
+  ipcMain.handle("get-selected-category", () => db.getSelectedCategory());
+  ipcMain.handle("clear-selected-category", () => db.clearSelectedCategory());
+  ipcMain.handle("update-categories-order", (_, categories) =>
+    db.updateMultipleCategoriesOrder(categories)
+  );
 
-  ipcMain.handle("delete-category", async (_, id) => {
-    await db.deleteCategory(id);
-    return true;
+  // folders
+  ipcMain.handle("get-folders", () => db.getFolders());
+  ipcMain.handle("add-folder", (_, name) => db.addFolder({ name }));
+  ipcMain.handle("update-folder", (_, { id, name }) => {
+    return db.updateFolder(id, { name });
   });
+  ipcMain.handle("delete-folder", (_, id) => db.deleteFolder(id));
+  ipcMain.handle("move-category-to-folder", (_, { categoryId, folderId }) =>
+    db.moveCategoryToFolder(categoryId, folderId)
+  );
+  ipcMain.handle("move-folder", (_, payload) =>
+    db.moveFolder(payload.folderId, payload.parentId, payload.order)
+  );
 
-  ipcMain.handle("get-tasks", async () => {
-    return await db.getTasks();
+  // tasks
+  ipcMain.handle("get-tasks", () => db.getTasks());
+  ipcMain.handle("add-task", (_, { categoryId, text }) => {
+    return db.addTask({ categoryId, text, completed: false });
   });
-
-  ipcMain.handle("add-task", async (_, { categoryId, text }) => {
-    const newTask = { categoryId, text, completed: false };
-    return await db.addTask(newTask);
-  });
-
   ipcMain.handle("update-task", async (_, { id, text }) => {
     await db.updateTask(id, { text });
     return await db.getTasks();
   });
+  ipcMain.handle("delete-task", (_, id) => db.deleteTask(id));
+  ipcMain.handle("update-tasks-order", (_, tasks) =>
+    db.updateMultipleTasksOrder(tasks)
+  );
 
   ipcMain.handle("toggle-task-completion", async (_, id) => {
     const tasks = await db.getTasks();
@@ -58,90 +73,27 @@ function setupIpcHandlers() {
     if (!task) return null;
 
     const newCompleted = !task.completed;
-
     const targetGroup = tasks.filter((t) => t.completed === newCompleted);
-    const maxOrder =
-      targetGroup.length > 0
-        ? Math.max(...targetGroup.map((t) => t.order))
-        : -1;
+    const maxOrder = targetGroup.length
+      ? Math.max(...targetGroup.map((t) => t.order))
+      : -1;
 
-    await db.updateTask(id, {
-      completed: newCompleted,
-      order: maxOrder + 1,
-    });
-
-    const allTasks = await db.getTasks();
-    const updatedTask = allTasks.find((t) => t._id === id);
+    await db.updateTask(id, { completed: newCompleted, order: maxOrder + 1 });
+    const updatedTask = (await db.getTasks()).find((t) => t._id === id);
     return updatedTask;
   });
 
-  ipcMain.handle("delete-task", async (_, id) => {
-    await db.deleteTask(id);
-    return true;
-  });
+  // colors
+  ipcMain.handle("get-color-mode", () => db.getColorMode());
+  ipcMain.handle("set-color-mode", (_, mode) => db.setColorMode(mode));
 
-  ipcMain.handle("get-color-mode", async () => {
-    return await db.getColorMode();
-  });
-
-  ipcMain.handle("set-color-mode", async (event, mode) => {
-    return await db.setColorMode(mode);
-  });
-
-  ipcMain.handle("set-selected-category", async (event, categoryId) => {
-    return await db.setSelectedCategory(categoryId);
-  });
-
-  ipcMain.handle("get-selected-category", async () => {
-    return await db.getSelectedCategory();
-  });
-
-  ipcMain.handle("clear-selected-category", async () => {
-    return await db.clearSelectedCategory();
-  });
-
-  ipcMain.handle("update-tasks-order", async (_, tasks) => {
-    return await db.updateMultipleTasksOrder(tasks);
-  });
-
-  ipcMain.handle("add-painting", async (_, name) => {
-    const newPainting = { name, color: "#ffffff" };
-    return await db.addPainting(newPainting);
-  });
-
-  ipcMain.handle("get-paintings", async () => {
-    return await db.getPaintings();
-  });
-
-  ipcMain.handle("update-painting", async (_, { id, name, strokes }) => {
-    await db.updatePainting(id, { name, strokes });
-    return await db.getPaintings();
-  });
-
-  ipcMain.handle("delete-painting", async (_, id) => {
-    await db.deletePainting(id);
-    return true;
-  });
-
-  ipcMain.handle("get-all-fonts", async () => {
-    return await db.getAllFonts();
-  });
-
-  ipcMain.handle("get-default-font", async () => {
-    return await db.getDefaultFont();
-  });
-
-ipcMain.handle("set-default-font", async (_, fontId) => {
-  try {
+  // fonts
+  ipcMain.handle("get-all-fonts", () => db.getAllFonts());
+  ipcMain.handle("get-default-font", () => db.getDefaultFont());
+  ipcMain.handle("set-default-font", async (_, fontId) => {
     await db.setDefaultFontById(fontId);
-    const font = await db.getDefaultFont();
-    return font;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-});
-
+    return db.getDefaultFont();
+  });
 }
 
 function createWindow() {
@@ -156,6 +108,7 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
+  // loads correct file, depending on devmode or build
   if (app.isPackaged) {
     win.loadFile(
       path.resolve(__dirname, "..", "frontend", "dist", "index.html")
