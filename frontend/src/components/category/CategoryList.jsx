@@ -1,6 +1,6 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { FolderPlus, Folder } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import FolderItem from "../folder/FolderItem";
 import CategoryItem from "./CategoryItem";
 
@@ -17,9 +17,9 @@ export default function CategoryList({
   deleteFolder,
   addFolder,
   updateCategoryOrder,
-  addCategoryToFolder
+  addCategoryToFolder,
 }) {
-  const [expandedFolders, setExpandedFolders] = useState(new Set());
+  const [expandedFolders, setExpandedFolders] = useState([]);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [localCategories, setLocalCategories] = useState([]);
@@ -28,25 +28,44 @@ export default function CategoryList({
     setLocalCategories(categories);
   }, [categories]);
 
-  useEffect(
-    () => setExpandedFolders(new Set(folders.map((f) => f._id))),
-    [folders]
+  // auto-expand folder when a category inside it is selected
+  useEffect(() => {
+    if (!selectedCategory || !categories.length) return;
+
+    const fullCategory = categories.find(
+      (cat) =>
+        cat._id === selectedCategory ||
+        (typeof selectedCategory === "object" &&
+          cat._id === selectedCategory._id)
+    );
+
+    if (fullCategory?.folderId) {
+      const folderIdStr = String(fullCategory.folderId);
+      setExpandedFolders((prev) =>
+        prev.includes(folderIdStr) ? prev : [...prev, folderIdStr]
+      );
+    }
+  }, [selectedCategory, categories]);
+
+  const toggleFolder = useCallback((id) => {
+    const idStr = String(id);
+    setExpandedFolders((prev) =>
+      prev.includes(idStr)
+        ? prev.filter((fId) => fId !== idStr)
+        : [...prev, idStr]
+    );
+  }, []);
+
+  // get sorted categories for folder, if null its root
+  const categoriesInFolder = useCallback(
+    (folderId) =>
+      localCategories
+        .filter((c) => c.folderId === folderId)
+        .sort((a, b) => a.order - b.order),
+    [localCategories]
   );
 
-  const toggleFolder = (id) => {
-    setExpandedFolders((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
-  const categoriesInFolder = (folderId) =>
-    localCategories
-      .filter((c) => c.folderId === folderId)
-      .sort((a, b) => a.order - b.order);
-
-  const handleDragEnd = async (result) => {
+  const handleDragEnd = (result) => {
     const { source, destination, draggableId } = result;
     if (!destination) return;
 
@@ -58,36 +77,36 @@ export default function CategoryList({
     if (sourceFolderId === destFolderId && source.index === destination.index)
       return;
 
-    // clone categories
-    let newCategories = [...localCategories];
-
-    // move the dragged category
+    const newCategories = [...localCategories];
     const dragged = newCategories.find((c) => c._id === draggableId);
+    if (!dragged) return;
+
     dragged.folderId = destFolderId;
 
-    // remove from old position
-    newCategories = newCategories.filter((c) => c._id !== draggableId);
+    // remove from old pos
+    const filtered = newCategories.filter((c) => c._id !== draggableId);
 
-    // get categories in destination folder and insert at correct index
-    const destCategories = newCategories
+    // Get destination list and insert it
+    const destCategories = filtered
       .filter((c) => c.folderId === destFolderId)
       .sort((a, b) => a.order - b.order);
 
     destCategories.splice(destination.index, 0, dragged);
 
-    // recompute order for all categories in destination folder
-    destCategories.forEach((c, i) => (c.order = i));
+    // reassign order
+    destCategories.forEach((cat, idx) => {
+      cat.order = idx;
+    });
 
-    // merge back other categories
-    newCategories = [
-      ...newCategories.filter((c) => c.folderId !== destFolderId),
+    // merge back
+    const updatedCategories = [
+      ...filtered.filter((c) => c.folderId !== destFolderId),
       ...destCategories,
     ];
 
-    // update local state immediately — **do not call fetchData**
-    setLocalCategories(newCategories);
+    setLocalCategories(updatedCategories);
 
-    // update backend in background
+    // update backend
     moveCategoryToFolder(draggableId, destFolderId);
     updateCategoryOrder(
       destCategories.map((c) => ({ _id: c._id, order: c.order }))
@@ -95,12 +114,15 @@ export default function CategoryList({
   };
 
   const handleCreateFolder = () => setIsCreatingFolder(true);
+
   const handleSaveNewFolder = async () => {
-    if (!newFolderName.trim()) return;
-    await addFolder(newFolderName.trim());
+    const name = newFolderName.trim();
+    if (!name) return;
+    await addFolder(name);
     setNewFolderName("");
     setIsCreatingFolder(false);
   };
+
   const handleCancelNewFolder = () => {
     setNewFolderName("");
     setIsCreatingFolder(false);
@@ -112,7 +134,7 @@ export default function CategoryList({
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="px-2 py-4 space-y-1">
         <div
-          className={`flex items-center justify-end mb-2 -mt-2 ${
+          className={`flex items-center justify-end mb-2 -mt-2 transition-opacity ${
             isCreatingFolder ? "opacity-100" : "opacity-0 hover:opacity-100"
           }`}
         >
@@ -128,7 +150,7 @@ export default function CategoryList({
                   if (e.key === "Escape") handleCancelNewFolder();
                 }}
                 onBlur={handleCancelNewFolder}
-                className="flex-1 bg-transparent text-sm font-medium outline-none border-b text-black dark:text-white"
+                className="flex-1 bg-transparent text-sm font-medium outline-none border-b border-primary text-black dark:text-white"
                 autoFocus
                 placeholder="Mappnamn"
               />
@@ -146,7 +168,7 @@ export default function CategoryList({
             key={folder._id}
             folder={folder}
             categories={categoriesInFolder(folder._id)}
-            expanded={expandedFolders.has(folder._id)}
+            expanded={expandedFolders.includes(String(folder._id))}
             toggle={toggleFolder}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
@@ -164,10 +186,10 @@ export default function CategoryList({
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className={`min-h-[40px] border border-transparent transition-colors ${
+              className={`min-h-[40px] transition-colors ${
                 snapshot.isDraggingOver
-                    ? "bg-gray-200 dark:bg-neutral-900/60 border border-gray-400 dark:border-neutral-800 border-dashed"
-                  : ""
+                  ? "bg-gray-200 dark:bg-neutral-900/60 border border-dashed border-gray-400 dark:border-neutral-800"
+                  : "border border-transparent"
               }`}
             >
               {rootCategories.map((cat, index) => (
