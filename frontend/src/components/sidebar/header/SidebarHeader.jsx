@@ -1,15 +1,21 @@
-import { Settings } from "lucide-react";
+import { FilePlus2, FolderPlus, PanelLeftClose, Settings, X } from "lucide-react";
 import NootLogo from "../../../assets/noot.png";
 
-export default function SidebarHeader({ setSettings }) {
+export default function SidebarHeader({ setSettings, onCreateFile, onCreateFolder, onToggle, onMobileClose }) {
   return (
-    <div className="hidden lg:flex h-[80px] items-center p-6 border-b border-neutral-200 dark:border-neutral-700">
-      <img src={NootLogo} className="w-10 h-10" />
-      <h1 className="ml-3 font-bold flex-1">Noot</h1>
-      <Settings
-        className="cursor-pointer"
-        onClick={() => setSettings(true)}
-      />
-    </div>
+    <header className="sidebar-header">
+      <div className="sidebar-brand-row">
+        <div className="sidebar-brand"><img src={NootLogo} alt="" /><span>Noot</span></div>
+        <div className="sidebar-header-actions">
+          <button type="button" className="icon-button desktop-only" title="Dölj sidomenyn (Ctrl+Shift+B)" aria-label="Dölj sidomenyn" onClick={onToggle}><PanelLeftClose size={19} /></button>
+          <button type="button" className="icon-button mobile-only" title="Stäng sidomenyn" aria-label="Stäng sidomenyn" onClick={onMobileClose}><X size={19} /></button>
+        </div>
+      </div>
+      <div className="sidebar-primary-actions">
+        <button type="button" className="new-file-button" onClick={onCreateFile}><FilePlus2 size={17} /> Ny fil</button>
+        <button type="button" className="icon-button" title="Ny mapp" aria-label="Ny mapp" onClick={onCreateFolder}><FolderPlus size={18} /></button>
+        <button type="button" className="icon-button" title="Inställningar" aria-label="Inställningar" onClick={() => setSettings(true)}><Settings size={18} /></button>
+      </div>
+    </header>
   );
 }

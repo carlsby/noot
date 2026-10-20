@@ -1,277 +1,111 @@
-import { useState, useRef, useEffect } from "react";
-import {
-  ChevronRight,
-  Folder,
-  Edit,
-  Trash,
-  File,
-  FilePlus,
-} from "lucide-react";
-import { Droppable, Draggable } from "@hello-pangea/dnd";
+import { useEffect, useRef, useState } from "react";
+import { ChevronRight, FilePlus2, Folder, FolderPlus, Pencil, Trash2 } from "lucide-react";
+import { Draggable, Droppable } from "@hello-pangea/dnd";
 import CategoryItem from "../category/CategoryItem";
 import { ConfirmModal } from "../shared/ConfirmModal";
 
-export default function FolderItem({
-  folder,
-  categories,
-  expanded,
-  toggle,
-  selectedCategory,
-  setSelectedCategory,
-  updateCategory,
-  deleteCategory,
-  getTaskCount,
-  updateFolder,
-  deleteFolder,
-  addCategoryToFolder,
-}) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(folder.name);
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
-  const [showConfirm, setShowConfirm] = useState(false);
-  const contextMenuRef = useRef(null);
-  const folderEditingRef = useRef(null);
-
-  const handleSave = () => {
-    if (editText.trim()) {
-      updateFolder(folder._id, editText.trim());
-      setIsEditing(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setEditText(folder.name);
-    setIsEditing(false);
-  };
-
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = Math.min(e.clientX - rect.left, rect.width - 160);
-    const y = e.clientY - rect.top;
-
-    setContextMenu({ show: true, x, y });
-  };
-
-  const closeContextMenu = () => {
-    setContextMenu({ show: false, x: 0, y: 0 });
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    closeContextMenu();
-  };
-
-  const handleDelete = () => {
-    setShowConfirm(true);
-    closeContextMenu();
-  };
-
+function InlineName({ icon, value, onChange, onSave, onCancel, onBlurAction = onCancel, label }) {
+  const inputRef = useRef(null);
+  const finished = useRef(false);
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(event.target)
-      ) {
-        closeContextMenu();
-      }
-    };
+    const input = inputRef.current;
+    input?.focus();
+    input?.select();
+    input?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, []);
+  return (
+    <div className="sidebar-inline-edit">
+      {icon}
+      <input ref={inputRef} value={value} aria-label={label} placeholder={label} onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") { event.preventDefault(); finished.current = true; onSave(); }
+          if (event.key === "Escape") { finished.current = true; onCancel(); }
+        }}
+        onBlur={() => { if (!finished.current) onBlurAction(); }} />
+    </div>
+  );
+}
 
-    if (contextMenu.show) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [contextMenu.show]);
+export default function FolderItem({ folder, hasChildFolders = false, categories, expanded, toggle,
+  selectedCategory, setSelectedCategory, updateCategory, deleteCategory, updateFolder, deleteFolder,
+  addCategoryToFolder, addFolder, editingFolderId, setEditingFolderId, onCreatedItem }) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(folder.name);
+  const [createType, setCreateType] = useState(null);
+  const [newName, setNewName] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
+  useEffect(() => { if (!editing) setName(folder.name); }, [folder.name, editing]);
   useEffect(() => {
-    if (!isEditing) return;
+    if (editingFolderId === folder._id) { setEditing(true); setEditingFolderId?.(null); }
+  }, [editingFolderId, folder._id, setEditingFolderId]);
 
-    const handleClickOutside = (event) => {
-      if (
-        folderEditingRef.current &&
-        !folderEditingRef.current.contains(event.target)
-      ) {
-        handleCancel();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isEditing]);
-
-  const handleCreateCategory = () => setIsCreatingCategory(true);
-  const handleSaveNewCategory = async () => {
-    await addCategoryToFolder(newCategoryName.trim(), folder._id);
-    setNewCategoryName("");
-    setIsCreatingCategory(false);
+  const saveFolderName = () => {
+    const trimmed = name.trim();
+    if (trimmed && trimmed !== folder.name) updateFolder(folder._id, trimmed);
+    setEditing(false);
   };
-  const handleCancelNewCategory = () => {
-    setNewCategoryName("");
-    setIsCreatingCategory(false);
+  const saveCreated = async () => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    const created = createType === "file"
+      ? await addCategoryToFolder(trimmed, folder._id)
+      : await addFolder(trimmed, folder._id);
+    if (created?._id) onCreatedItem?.(createType, created._id);
+    setNewName("");
+    setCreateType(null);
+    if (!expanded) toggle(folder._id);
+  };
+  const startCreate = (type) => {
+    setCreateType(type);
+    setNewName("");
+    if (!expanded) toggle(folder._id);
   };
 
   return (
     <>
-      <div className="mb-1 relative">
-        {isEditing ? (
-          <div
-            ref={folderEditingRef}
-            className="flex items-center gap-2 px-2 py-2 bg-accent/30 rounded-md"
-          >
-            <Folder className="w-4 h-4 flex-shrink-0" />
-            <input
-              type="text"
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave();
-                if (e.key === "Escape") handleCancel();
-              }}
-              className="flex-1 bg-transparent text-sm font-medium outline-none border-b border-primary"
-              autoFocus
-              placeholder="Mappnamn"
-            />
-          </div>
+      <div className="sidebar-folder-block">
+        {editing ? (
+          <InlineName icon={<Folder size={17} />} value={name} onChange={setName} onSave={saveFolderName} onBlurAction={saveFolderName}
+            onCancel={() => { setName(folder.name); setEditing(false); }} label="Mappnamn" />
         ) : (
-          <button
+          <div role="button" tabIndex={0} aria-expanded={expanded} data-item-type="folder" data-item-id={folder._id} className="group sidebar-folder-row"
             onClick={() => toggle(folder._id)}
-            onContextMenu={handleContextMenu}
-            className="flex items-center gap-2 w-full px-1 py-1 rounded-md hover:bg-accent/50 transition-colors"
-          >
-            <ChevronRight
-              className={`w-4 h-4 text-muted-foreground transition-transform ${
-                expanded ? "rotate-90" : ""
-              }`}
-            />
-            <span className="text-base font-medium flex-1 text-left truncate">
-              {folder.name}
+            onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); toggle(folder._id); } }}>
+            <ChevronRight className={`folder-chevron ${expanded ? "is-expanded" : ""}`} size={15} />
+            <Folder className="folder-icon" size={17} />
+            <span className="sidebar-file-name">{folder.name}</span>
+            <span className="sidebar-row-actions">
+              <button type="button" title="Ny fil i mappen" aria-label={`Ny fil i ${folder.name}`} onClick={(event) => { event.stopPropagation(); startCreate("file"); }}><FilePlus2 size={14} /></button>
+              <button type="button" title="Ny undermapp" aria-label={`Ny undermapp i ${folder.name}`} onClick={(event) => { event.stopPropagation(); startCreate("folder"); }}><FolderPlus size={14} /></button>
+              <button type="button" title="Byt namn" aria-label={`Byt namn på ${folder.name}`} onClick={(event) => { event.stopPropagation(); setEditing(true); }}><Pencil size={14} /></button>
+              <button type="button" title={hasChildFolders ? "Ta bort undermappar först" : "Radera mapp"} aria-label={`Radera ${folder.name}`}
+                disabled={hasChildFolders} onClick={(event) => { event.stopPropagation(); setConfirmDelete(true); }}><Trash2 size={14} /></button>
             </span>
-            {expanded && (
-              <div>
-                {!isCreatingCategory && (
-                  <FilePlus
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleCreateCategory();
-                    }}
-                    className="w-4 h-4 cursor-pointer text-gray-500 dark:text-gray-100"
-                  />
-                )}
-              </div>
-            )}
-          </button>
-        )}
-
-        {expanded && (
-          <Droppable droppableId={folder._id}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className={`ml-6 relative min-h-[40px] pl-2 ${
-                  categories.length > 0
-                    ? "border-l border-gray-300 dark:border-neutral-800"
-                    : ""
-                } ${
-                  snapshot.isDraggingOver
-                    ? "bg-gray-200 dark:bg-neutral-900/60 border border-gray-400 dark:border-neutral-800 border-dashed"
-                    : ""
-                }`}
-              >
-                {categories.map((cat, index) => (
-                  <Draggable key={cat._id} draggableId={cat._id} index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={snapshot.isDragging ? "opacity-50" : ""}
-                      >
-                        <CategoryItem
-                          category={cat}
-                          selectedCategory={selectedCategory}
-                          setSelectedCategory={setSelectedCategory}
-                          updateCategory={updateCategory}
-                          deleteCategory={deleteCategory}
-                          getTaskCount={getTaskCount}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-
-                {isCreatingCategory ? (
-                  <div className="flex-1 flex items-center gap-2 px-1 py-1.5 bg-accent/30 rounded-md">
-                    <File className="w-3 h-3 flex-shrink-0" />
-                    <input
-                      type="text"
-                      className="flex-1 bg-transparent text-sm font-medium outline-none border-b text-black dark:text-white"
-                      autoFocus
-                      placeholder="Kategorinamn"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleSaveNewCategory();
-                        if (e.key === "Escape") handleCancelNewCategory();
-                      }}
-                      onBlur={handleCancelNewCategory}
-                    />
-                  </div>
-                ) : (
-                  ""
-                )}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        )}
-
-        {contextMenu.show && (
-          <div
-            ref={contextMenuRef}
-            className="absolute z-[70] bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 space:bg-indigo-950 space:border-indigo-900 shadow-2xl py-2 min-w-[150px] p-2 backdrop-blur-sm animate-in fade-in-0 zoom-in-95 duration-200"
-            style={{
-              left: `${contextMenu.x}px`,
-              top: `${contextMenu.y + 8}px`,
-            }}
-          >
-            <button
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40 space:text-green-400 space:hover:bg-green-900 transition-colors duration-150"
-              onClick={handleEdit}
-            >
-              <Edit size={16} />
-              Redigera
-            </button>
-            <div className="h-px bg-gray-100 dark:bg-neutral-800 mx-2 my-1 space:bg-green-900" />
-            <button
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 space:hover:bg-red-700 space:hover:text-red-200 transition-colors duration-150"
-              onClick={handleDelete}
-            >
-              <Trash size={16} />
-              Radera
-            </button>
           </div>
         )}
-      </div>
 
-      {showConfirm && (
-        <ConfirmModal
-          message={`Vill du radera mappen "${folder.name}"? Kategorierna flyttas till roten.`}
-          onConfirm={() => {
-            deleteFolder(folder._id);
-            setShowConfirm(false);
-          }}
-          onCancel={() => setShowConfirm(false)}
-        />
-      )}
+        {createType && <InlineName icon={createType === "file" ? <FilePlus2 size={17} /> : <FolderPlus size={17} />} value={newName} onChange={setNewName}
+          onSave={saveCreated} onCancel={() => { setCreateType(null); setNewName(""); }}
+          label={createType === "file" ? "Filnamn" : "Mappnamn"} />}
+
+        {expanded && <Droppable droppableId={folder._id}>
+          {(provided, snapshot) => (
+            <div ref={provided.innerRef} {...provided.droppableProps} className={`folder-dropzone ${snapshot.isDraggingOver ? "is-over" : ""}`}>
+              {categories.map((category, index) => <Draggable key={category._id} draggableId={category._id} index={index}>
+                {(dragProvided, dragSnapshot) => <div ref={dragProvided.innerRef} {...dragProvided.draggableProps} {...dragProvided.dragHandleProps}
+                  className={dragSnapshot.isDragging ? "is-dragging" : ""}>
+                  <CategoryItem category={category} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
+                    updateCategory={updateCategory} deleteCategory={deleteCategory} />
+                </div>}
+              </Draggable>)}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>}
+      </div>
+      {confirmDelete && <ConfirmModal message={`Vill du radera mappen "${folder.name}"? Filerna flyttas till roten.`}
+        onConfirm={() => { deleteFolder(folder._id); setConfirmDelete(false); }} onCancel={() => setConfirmDelete(false)} />}
     </>
   );
 }

@@ -3,17 +3,19 @@ import { useState, useEffect } from "react";
 export default function useCategories() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loaded, setLoaded] = useState(false);
 
   const fetchCategories = async () => {
     const cats = await window.electronAPI.invoke("get-categories");
     setCategories(cats);
+    return cats;
   };
 
   const loadSelectedCategory = async () => {
     const savedCategoryId = await window.electronAPI.invoke(
       "get-selected-category"
     );
-    if (!savedCategoryId) return;
+    if (!savedCategoryId) { setLoaded(true); return; }
     const cats = await window.electronAPI.invoke("get-categories");
     const exists = cats.some((cat) => cat._id === savedCategoryId);
     if (exists) setSelectedCategory(savedCategoryId);
@@ -21,6 +23,7 @@ export default function useCategories() {
       await window.electronAPI.invoke("clear-selected-category");
       setSelectedCategory(null);
     }
+    setLoaded(true);
   };
 
   useEffect(() => {
@@ -29,38 +32,39 @@ export default function useCategories() {
   }, []);
 
   useEffect(() => {
-    if (selectedCategory) {
-      window.electronAPI.invoke("set-selected-category", selectedCategory);
-    }
-  }, [selectedCategory]);
+    if (!loaded) return;
+    window.electronAPI.invoke(selectedCategory ? "set-selected-category" : "clear-selected-category", selectedCategory);
+  }, [selectedCategory, loaded]);
 
   const addCategory = async (name) => {
     const addedCategory = await window.electronAPI.invoke("add-category", name);
     if (addedCategory) {
       setSelectedCategory(addedCategory._id);
-      fetchCategories();
+      await fetchCategories();
       return addedCategory;
     }
   };
 
   const addCategoryToFolder = async (name, folderId) => {
-    await window.electronAPI.invoke("add-category-to-folder", {
+    const createdCategory = await window.electronAPI.invoke("add-category-to-folder", {
       name,
       folderId,
     });
-    fetchCategories();
+    await fetchCategories();
+    setSelectedCategory(createdCategory._id);
+    return createdCategory;
   };
 
   const updateCategory = async (id, name) => {
     await window.electronAPI.invoke("update-category", { id, name });
-    fetchCategories();
+    await fetchCategories();
   };
 
   const deleteCategory = async (id) => {
     await window.electronAPI.invoke("delete-category", id);
-    fetchCategories();
+    await fetchCategories();
     if (selectedCategory === id) {
-      setSelectedCategory(categories[0]?._id || null);
+      setSelectedCategory(null);
     }
   };
 
@@ -70,12 +74,13 @@ export default function useCategories() {
       folderId,
       order,
     });
-    fetchCategories();
+    await fetchCategories();
   };
 
-  // updates task order
-  const updateCategoryOrder = async (_id, order) => {
-    await window.electronAPI.invoke("update-categories-order", _id, order);
+  // Save the order of files within one folder.
+  const updateCategoryOrder = async (orderedCategories) => {
+    await window.electronAPI.invoke("update-categories-order", orderedCategories);
+    await fetchCategories();
   };
 
   return {

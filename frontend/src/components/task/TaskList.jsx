@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { NotebookPen } from "lucide-react";
 import TaskItem from "./TaskItem";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
@@ -32,20 +32,11 @@ export default function TaskList({
     // Ta bort uppgiften från dess ursprungliga plats
     const [movedTask] = updatedTasks.splice(source.index, 1);
 
-    // Hitta första index där uppgiften är markerad som klar
-    const firstCompletedIndex = updatedTasks.findIndex(
-      (task) => task.completed
-    );
-
-    // Om en icke-avklarad uppgift försöker flyttas under en avklarad, avbryt
-    const isMovingIncompleteBelowCompleted =
-      !movedTask.completed &&
-      firstCompletedIndex !== -1 &&
-      destination.index >= firstCompletedIndex;
-
-    if (isMovingIncompleteBelowCompleted) {
-      return; // Avbryt drag
-    }
+    const incompleteCount = updatedTasks.filter((task) => !task.completed).length;
+    const crossesCompletionGroup = movedTask.completed
+      ? destination.index < incompleteCount
+      : destination.index > incompleteCount;
+    if (crossesCompletionGroup) return;
 
     // Sätt in uppgiften på den nya platsen
     updatedTasks.splice(destination.index, 0, movedTask);
@@ -71,18 +62,10 @@ export default function TaskList({
 
   if (localTasks.length === 0) {
     return (
-      <div className="text-gray-500 dark:text-gray-400 text-center py-12">
-        <div className="flex flex-col items-center justify-center h-full">
-          <NotebookPen
-            style={{ color: categoryColor }}
-            size={40}
-            className="mb-4"
-          />
-          <p className="text-lg dark:text-gray-300">Inga anteckningar ännu</p>
-          <p className="text-sm dark:text-gray-400">
-            Lägg till en anteckning nedan
-          </p>
-        </div>
+      <div className="document-empty">
+        <NotebookPen style={{ color: categoryColor || "var(--accent)" }} size={26} />
+        <strong>Inga anteckningar ännu</strong>
+        <span>Skriv din första anteckning nedan.</span>
       </div>
     );
   }
@@ -100,12 +83,12 @@ export default function TaskList({
           <ul
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="h-full"
+            className="note-list"
           >
             {localTasks.map((task, index) => (
               <Draggable key={task._id} draggableId={task._id} index={index}>
                 {(provided, snapshot) => (
-                  <li ref={provided.innerRef} {...provided.draggableProps} className="mb-2">
+                  <li ref={provided.innerRef} {...provided.draggableProps} className="note-row">
                     <TaskItem
                       task={task}
                       updateTask={updateTask}
@@ -114,6 +97,7 @@ export default function TaskList({
                       dragHandleProps={provided.dragHandleProps}
                       editingTaskId={editingTaskId}
                       setEditingTaskId={setEditingTaskId}
+                      isDragging={snapshot.isDragging}
                     />
                   </li>
                 )}

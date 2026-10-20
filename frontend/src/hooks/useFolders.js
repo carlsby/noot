@@ -12,19 +12,20 @@ export default function useFolders() {
     fetchFolders();
   }, []);
 
-  const addFolder = async (name) => {
-    await window.electronAPI.invoke("add-folder", name);
-    fetchFolders();
+  const addFolder = async (name, parentId = null) => {
+    const created = await window.electronAPI.invoke("add-folder", { name, parentId });
+    await fetchFolders();
+    return created;
   };
 
   const updateFolder = async (id, name) => {
     await window.electronAPI.invoke("update-folder", { id, name });
-    fetchFolders();
+    await fetchFolders();
   };
 
   const deleteFolder = async (id) => {
     await window.electronAPI.invoke("delete-folder", id);
-    fetchFolders();
+    await fetchFolders();
   };
 
   return { folders, addFolder, updateFolder, deleteFolder, fetchFolders };

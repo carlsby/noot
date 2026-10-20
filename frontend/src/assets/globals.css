@@ -1,90 +1,63 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-* {
-  transition-property: background-color, border-color, color, fill, stroke,
-    opacity;
-  transition-duration: 300ms;
-  transition-timing-function: ease;
-}
-
+/* Each theme supplies colors to the shared layout in design.css. */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 245, 245, 247;
+  --n-50: #fafafa; --n-100: #f5f5f5; --n-200: #e5e5e5;
+  --n-300: #d4d4d4; --n-400: #a3a3a3; --n-500: #737373;
+  --n-600: #525252; --n-700: #404040; --n-800: #262626;
+  --n-900: #171717; --n-950: #0a0a0a;
+  --white-bg: #fff; --black-bg: #000;
+  --app-bg: var(--n-100); --sidebar-bg: var(--n-50);
+  --card-bg: var(--white-bg); --border: var(--n-200);
+  --text: var(--n-900); --muted: var(--n-600); --accent: #4856aa;
+  --hover-bg: var(--n-200); --accent-contrast: #fff;
 }
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+:root[data-theme="dark"] {
+  --n-50: #fafafa; --n-100: #f5f5f5; --n-200: #e5e5e5;
+  --n-300: #d4d4d4; --n-400: #a3a3a3; --n-500: #737373;
+  --n-600: #525252; --n-700: #404040; --n-800: #262626;
+  --n-900: #171717; --n-950: #0a0a0a;
+  --white-bg: #fff; --black-bg: #000;
+  --app-bg: var(--n-950); --sidebar-bg: var(--n-950);
+  --card-bg: var(--n-900); --border: var(--n-800);
+  --text: var(--n-100); --muted: var(--n-400); --accent: #a8b4ff;
+  --hover-bg: var(--n-800); --accent-contrast: #171717;
 }
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+:root[data-theme="sepia"] {
+  --n-50: #fbf6ed; --n-100: #f5ecdf; --n-200: #e7d9c7;
+  --n-300: #d4c2ac; --n-400: #aa9783; --n-500: #897561;
+  --n-600: #715e4d; --n-700: #5d4c3f; --n-800: #49392f;
+  --n-900: #35291f; --n-950: #241b16;
+  --white-bg: #fffaf2; --black-bg: #241b16;
+  --app-bg: var(--n-100); --sidebar-bg: var(--n-50);
+  --card-bg: var(--white-bg); --border: var(--n-200);
+  --text: var(--n-900); --muted: var(--n-600); --accent: #8d5730;
 }
-
-::-webkit-scrollbar-track {
-  background: transparent;
+:root[data-theme="slate"] {
+  --n-50: #f7f9fc; --n-100: #ecf1f7; --n-200: #d8e1ed;
+  --n-300: #bbcadd; --n-400: #8da1ba; --n-500: #6c819c;
+  --n-600: #536781; --n-700: #40536b; --n-800: #2d3d52;
+  --n-900: #1d2b3d; --n-950: #142032;
+  --white-bg: #fff; --black-bg: #142032;
+  --app-bg: var(--n-100); --sidebar-bg: var(--n-50);
+  --card-bg: var(--white-bg); --border: var(--n-200);
+  --text: var(--n-900); --muted: var(--n-600); --accent: #355d96;
 }
-
-::-webkit-scrollbar-thumb {
-  background: #d1d1d6;
+:root[data-theme="forest"] {
+  --n-50: #f7faf5; --n-100: #edf4e9; --n-200: #d7e5d3;
+  --n-300: #bad1b5; --n-400: #8ba886; --n-500: #698764;
+  --n-600: #506c4e; --n-700: #3d563d; --n-800: #2b402e;
+  --n-900: #1c3023; --n-950: #102019;
+  --white-bg: #fcfefb; --black-bg: #102019;
+  --app-bg: var(--n-100); --sidebar-bg: var(--n-50);
+  --card-bg: var(--white-bg); --border: var(--n-200);
+  --text: var(--n-900); --muted: var(--n-600); --accent: #397047;
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: #c1c1c6;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #48484a;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #636366;
-}
-
-.dark {
-  color-scheme: dark;
-}
-
-/* Webkit (Chrome, Safari, Edge) */
-.purple-range::-webkit-slider-runnable-track {
-  height: 8px;
-  background: linear-gradient(to right, #ffff, #ffff); 
-  border: 1px solid rgb(202, 202, 202);
-}
-
-.purple-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background-color: black; 
-  cursor: pointer;
-  margin-top: -6px; 
-  border: 2px solid white;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
-}
-
-/* Firefox */
-.purple-range::-moz-range-track {
-  height: 8px;
-  background: linear-gradient(to right, #7c3aed, #a78bfa);
-}
-
-.purple-range::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background-color: #7c3aed;
-  border: 2px solid white;
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(124, 58, 237, 0.7);
-}
-
-
-.dragging {
-  max-width: 100% !important;
-  box-sizing: border-box;
-  overflow-wrap: break-word;
+:root[data-theme="rose"] {
+  --n-50: #fff9fa; --n-100: #fbf0f2; --n-200: #f0dce0;
+  --n-300: #dfc0c8; --n-400: #b994a0; --n-500: #96727e;
+  --n-600: #795761; --n-700: #634550; --n-800: #4c333d;
+  --n-900: #38252f; --n-950: #251820;
+  --white-bg: #fffdfd; --black-bg: #251820;
+  --app-bg: var(--n-100); --sidebar-bg: var(--n-50);
+  --card-bg: var(--white-bg); --border: var(--n-200);
+  --text: var(--n-900); --muted: var(--n-600); --accent: #9b466b;
 }

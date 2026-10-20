@@ -32,6 +32,10 @@ const fontDB = new Datastore({
   filename: path.join(userDataDir, "fonts.db"),
   autoload: true,
 });
+const displayDB = new Datastore({
+  filename: path.join(userDataDir, "display.db"),
+  autoload: true,
+});
 
 // array of fonts (more can be added in index.html)
 const fonts = [
@@ -508,6 +512,32 @@ function setDefaultFontById(fontId) {
   });
 }
 
+const DEFAULT_NOTE_FONT_SIZE = 14;
+
+function getNoteFontSize() {
+  return new Promise((resolve, reject) => {
+    displayDB.findOne({ _id: "noteFontSize" }, (err, doc) => {
+      if (err) return reject(err);
+      const size = doc?.size;
+      resolve(Number.isInteger(size) && size >= 12 && size <= 20 ? size : DEFAULT_NOTE_FONT_SIZE);
+    });
+  });
+}
+
+function setNoteFontSize(size) {
+  if (!Number.isInteger(size) || size < 12 || size > 20) {
+    return Promise.reject(new RangeError("Note font size must be an integer from 12 to 20"));
+  }
+  return new Promise((resolve, reject) => {
+    displayDB.update(
+      { _id: "noteFontSize" },
+      { _id: "noteFontSize", size },
+      { upsert: true },
+      (err) => err ? reject(err) : resolve(size)
+    );
+  });
+}
+
 // exports to main.js
 module.exports = {
   getCategories,
@@ -534,5 +564,7 @@ module.exports = {
   getFolders,
   updateFolder,
   updateMultipleCategoriesOrder,
-  addCategoryToFolder
+  addCategoryToFolder,
+  getNoteFontSize,
+  setNoteFontSize
 };

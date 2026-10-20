@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const path = require("path");
 const db = require("./db.js");
 
@@ -41,7 +41,9 @@ function setupIpcHandlers() {
 
   // folders
   ipcMain.handle("get-folders", () => db.getFolders());
-  ipcMain.handle("add-folder", (_, name) => db.addFolder({ name }));
+  ipcMain.handle("add-folder", (_, { name, parentId }) =>
+    db.addFolder({ name, parentId })
+  );
   ipcMain.handle("update-folder", (_, { id, name }) => {
     return db.updateFolder(id, { name });
   });
@@ -93,6 +95,15 @@ function setupIpcHandlers() {
   ipcMain.handle("set-default-font", async (_, fontId) => {
     await db.setDefaultFontById(fontId);
     return db.getDefaultFont();
+  });
+
+  ipcMain.handle("get-note-font-size", () => db.getNoteFontSize());
+  ipcMain.handle("set-note-font-size", (_, size) => db.setNoteFontSize(size));
+
+  ipcMain.handle("open-external-url", async (_, url) => {
+    if (!url || typeof url !== "string") return false;
+    await shell.openExternal(url);
+    return true;
   });
 }
 

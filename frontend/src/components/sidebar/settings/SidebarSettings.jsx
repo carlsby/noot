@@ -5,7 +5,12 @@ export default function SidebarSettings({
   getAllFonts,
   setDefaultFont,
   fontCss,
-  fetchTheme,
+  theme,
+  changeTheme,
+  noteFontSize,
+  changeNoteFontSize,
+  fontSizeSaving,
+  fontSizeError,
 }) {
   return (
     <SettingsMenu
@@ -13,7 +18,12 @@ export default function SidebarSettings({
       getAllFonts={getAllFonts}
       setDefaultFont={setDefaultFont}
       fontCss={fontCss}
-      fetchTheme={fetchTheme}
+      theme={theme}
+      changeTheme={changeTheme}
+      noteFontSize={noteFontSize}
+      changeNoteFontSize={changeNoteFontSize}
+      fontSizeSaving={fontSizeSaving}
+      fontSizeError={fontSizeError}
     />
   );
 }

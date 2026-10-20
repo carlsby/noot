@@ -1,8 +1,8 @@
-import { DragDropContext } from "@hello-pangea/dnd";
 import CategoryList from "../category/CategoryList";
 
 export default function FolderList({
   categories,
+  addCategory,
   selectedCategory,
   setSelectedCategory,
   onSelect,
@@ -14,28 +14,14 @@ export default function FolderList({
   deleteFolder,
   addCategoryToFolder,
   updateCategoryOrder,
-  addFolder
+  addFolder,
+  rootCreateType,
+  setRootCreateType,
 }) {
-  const handleDragEnd = (result) => {
-    const { draggableId, source, destination } = result;
-    if (!destination) return;
-
-    const sourceFolderId =
-      source.droppableId === "root" ? null : source.droppableId;
-    const destFolderId =
-      destination.droppableId === "root" ? null : destination.droppableId;
-
-    if (sourceFolderId === destFolderId && source.index === destination.index)
-      return;
-
-    moveCategoryToFolder(draggableId, destFolderId);
-    updateCategoryOrder?.(draggableId, source, destination);
-  };
-
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
       <CategoryList
         categories={categories}
+        addCategory={addCategory}
         selectedCategory={selectedCategory}
         setSelectedCategory={(id) => {
           setSelectedCategory(id);
@@ -50,7 +36,8 @@ export default function FolderList({
         addCategoryToFolder={addCategoryToFolder}
         updateCategoryOrder={updateCategoryOrder}
         addFolder={addFolder}
+        rootCreateType={rootCreateType}
+        setRootCreateType={setRootCreateType}
       />
-    </DragDropContext>
   );
 }

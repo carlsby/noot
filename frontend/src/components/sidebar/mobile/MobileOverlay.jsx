@@ -3,7 +3,7 @@ export default function MobileOverlay({ isOpen, onClose }) {
 
   return (
     <div
-      className="lg:hidden fixed inset-0 bg-black/20 z-40"
+      className="sidebar-overlay"
       onClick={onClose}
     />
   );

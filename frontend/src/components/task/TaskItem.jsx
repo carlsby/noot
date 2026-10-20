@@ -1,205 +1,88 @@
-import { useEffect, useRef, useState } from "react";
-import { GripVertical } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Circle, CircleCheck, GripVertical, Pencil, Trash2 } from "lucide-react";
 import { ConfirmModal } from "../shared/ConfirmModal";
+import RichTextEditor from "./RichTextEditor";
+import { getPlainTextFromRichHtml, isRichHtmlEmpty, openExternalUrl, sanitizeRichHtml } from "../../utils/richText";
 
-export default function TaskItem({
-  task,
-  updateTask,
-  toggleTaskCompletion,
-  deleteTask,
-  dragHandleProps,
-  editingTaskId,
-  setEditingTaskId,
-  isDragging = false,
-}) {
-  const isEditing = editingTaskId === task._id;
-  const [editText, setEditText] = useState(task.text);
+export default function TaskItem({ task, updateTask, toggleTaskCompletion, deleteTask, dragHandleProps, editingTaskId, setEditingTaskId, isDragging = false }) {
+  const editing = editingTaskId === task._id;
+  const [editHtml, setEditHtml] = useState(task.text || "");
   const [showConfirm, setShowConfirm] = useState(false);
-  const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
-  const textareaRef = useRef(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const editContainerRef = useRef(null);
-  const contextMenuRef = useRef(null);
+  const latestEditHtml = useRef(task.text || "");
+  const savingRef = useRef(false);
 
-  const handleSave = () => {
-    if (editText.trim() === "") return;
-    updateTask(task._id, editText);
+  useEffect(() => {
+    if (!editing) { latestEditHtml.current = task.text || ""; setEditHtml(task.text || ""); }
+  }, [task.text, editing]);
+
+  const save = useCallback(async (html) => {
+    if (savingRef.current) return;
+    const clean = sanitizeRichHtml(typeof html === "string" ? html : latestEditHtml.current);
+    if (isRichHtmlEmpty(clean)) return;
+    savingRef.current = true;
+    setSaving(true);
+    setSaveError(false);
+    try {
+      await updateTask(task._id, clean);
+      setEditingTaskId((current) => current === task._id ? null : current);
+    } catch {
+      setSaveError(true);
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
+  }, [task._id, updateTask, setEditingTaskId]);
+
+  const cancel = () => {
+    latestEditHtml.current = task.text || "";
+    setEditHtml(task.text || "");
     setEditingTaskId(null);
   };
 
-  const handleCancel = () => {
-    setEditText(task.text);
-    setEditingTaskId(null);
-  };
-
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + "px";
-    }
-  }, [editText, isEditing]);
-
-  useEffect(() => {
-    if (!isEditing) return;
-    const handleClickOutside = (event) => {
-      if (
-        editContainerRef.current &&
-        !editContainerRef.current.contains(event.target)
-      ) {
-        handleSave();
-      }
+    if (!editing) return;
+    const onOutsideClick = (event) => {
+      if (editContainerRef.current && !editContainerRef.current.contains(event.target)) save();
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isEditing, editText]);
+    document.addEventListener("mousedown", onOutsideClick);
+    return () => document.removeEventListener("mousedown", onOutsideClick);
+  }, [editing, save]);
 
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-
-    const menuWidth = 180;
-    const menuHeight = 120;
-
-    let x = e.clientX;
-    let y = e.clientY;
-
-    if (x + menuWidth > window.innerWidth) {
-      x = window.innerWidth - menuWidth - 8;
-    }
-
-    if (y + menuHeight > window.innerHeight) {
-      y = window.innerHeight - menuHeight - 8;
-    }
-
-    setContextMenu({ show: true, x, y });
-  };
-
-  const closeContextMenu = () => setContextMenu({ show: false, x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(event.target)
-      ) {
-        closeContextMenu();
-      }
-    };
-    if (contextMenu.show) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [contextMenu.show]);
-
-  useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      const el = textareaRef.current;
-      const len = el.value.length;
-
-      el.focus();
-      el.setSelectionRange(len, len);
-    }
-  }, [isEditing]);
-
-  // för ta bort modalen
-  const truncated =
-    task.text.length > 40 ? task.text.slice(0, 40) + "..." : task.text;
+  const preview = getPlainTextFromRichHtml(task.text).slice(0, 40);
 
   return (
     <>
-      {isEditing ? (
-        <div
-          ref={editContainerRef}
-          className="bg-white dark:bg-neutral-900/60 p-3 shadow-sm transition-all border border-neutral-400 dark:border-neutral-700"
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex flex-col gap-2 flex-shrink-0 items-center">
-              <div className="opacity-30 group-hover:opacity-60">
-                <GripVertical size={16} className="text-neutral-400" />
-              </div>
-            </div>
-            <textarea
-              ref={textareaRef}
-              className="flex-1 resize-none bg-transparent border-none outline-none text-neutral-900 dark:text-neutral-100 text-sm placeholder-neutral-400 p-1"
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSave();
-                }
-                if (e.key === "Escape") handleCancel();
-              }}
-              autoFocus
-              placeholder="Skriv din anteckning..."
-            />
+      {editing ? (
+        <div ref={editContainerRef} className="note-edit-card">
+          <RichTextEditor value={editHtml} onChange={(html) => { latestEditHtml.current = html; setEditHtml(html); }} onSubmit={save} onCancel={cancel}
+            placeholder="Redigera anteckning..." autoFocus />
+          <div className="note-edit-actions">
+            {saveError && <span className="note-save-error" role="alert">Kunde inte spara. Försök igen.</span>}
+            <button type="button" onClick={cancel}>Avbryt</button>
+            <button type="button" className="primary-action" onClick={() => save()} disabled={saving || isRichHtmlEmpty(editHtml)}>{saving ? "Sparar..." : "Spara"}</button>
           </div>
         </div>
       ) : (
-        <div
-          {...dragHandleProps}
-          className={`group bg-white dark:bg-neutral-900/60 p-3 border border-transparent hover:border-neutral-400 dark:hover:border-neutral-800 transition-all duration-200 cursor-grab active:cursor-grabbing ${
-            task.completed ? "opacity-40 line-through" : ""
-          } ${
-            isDragging
-              ? "shadow-lg border-neutral-400 dark:border-neutral-600"
-              : "hover:shadow-sm"
-          }`}
-          onDoubleClick={() => setEditingTaskId(task._id)}
-          onContextMenu={handleContextMenu}
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex flex-col gap-2 flex-shrink-0 items-center">
-              <div className="opacity-30 group-hover:opacity-60">
-                <GripVertical size={16} className="text-neutral-400" />
-              </div>
-            </div>
-
-            <span className="flex-1 text-sm whitespace-pre-line text-neutral-900 dark:text-neutral-100">
-              {task.text}
-            </span>
+        <div className={`note-card ${task.completed ? "note-completed" : ""} ${isDragging ? "is-dragging" : ""}`}>
+          <button type="button" {...dragHandleProps} className="note-drag-handle" title="Dra för att ändra ordning" aria-label="Dra för att ändra ordning"><GripVertical size={17} /></button>
+          <div className="note-content" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(task.text) }}
+            onDoubleClick={() => setEditingTaskId(task._id)}
+            onClick={(event) => {
+              const anchor = event.target.closest?.("a");
+              if (anchor) { event.preventDefault(); openExternalUrl(anchor.href); }
+            }} />
+          <div className="note-actions">
+            <button type="button" className="icon-button" title={task.completed ? "Markera som ofärdig" : "Markera som färdig"} aria-label={task.completed ? "Markera som ofärdig" : "Markera som färdig"} onClick={() => toggleTaskCompletion(task._id)}>{task.completed ? <CircleCheck size={18} /> : <Circle size={18} />}</button>
+            <button type="button" className="icon-button" title="Redigera anteckning" aria-label="Redigera anteckning" onClick={() => setEditingTaskId(task._id)}><Pencil size={16} /></button>
+            <button type="button" className="icon-button" title="Radera anteckning" aria-label="Radera anteckning" onClick={() => setShowConfirm(true)}><Trash2 size={16} /></button>
           </div>
-
-          {contextMenu.show && (
-            <div
-              ref={contextMenuRef}
-              className="absolute z-[70] bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 shadow-2xl py-2 min-w-[160px] p-2"
-              style={{ left: contextMenu.x + "px", top: contextMenu.y + "px" }}
-            >
-              <button
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-neutral-800"
-                onClick={() => {
-                  toggleTaskCompletion(task._id);
-                  closeContextMenu();
-                }}
-              >
-                {task.completed ? "Markera som ofärdig" : "Markera som färdig"}
-              </button>
-              <div className="h-px bg-gray-100 dark:bg-gray-800 my-1" />
-              <button
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                onClick={() => {
-                  setShowConfirm(true);
-                  closeContextMenu();
-                }}
-              >
-                Radera
-              </button>
-            </div>
-          )}
         </div>
       )}
-
-      {showConfirm && (
-        <ConfirmModal
-          message={`Är du säker på att du vill ta bort anteckningen "${truncated}"?`}
-          onConfirm={() => {
-            deleteTask(task._id);
-            setShowConfirm(false);
-          }}
-          onCancel={() => setShowConfirm(false)}
-        />
-      )}
+      {showConfirm && <ConfirmModal message={`Ta bort anteckningen ${preview ? `"${preview}${preview.length >= 40 ? "…" : ""}"` : ""}?`}
+        onConfirm={() => { deleteTask(task._id); setShowConfirm(false); }} onCancel={() => setShowConfirm(false)} />}
     </>
   );
 }
